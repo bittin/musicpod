@@ -7,6 +7,7 @@ import 'package:radio_browser_api/radio_browser_api.dart' hide Country;
 import 'package:safe_change_notifier/safe_change_notifier.dart';
 
 import '../common/data/audio.dart';
+import '../common/data/audio_type.dart';
 import '../common/data/podcast_genre.dart';
 import '../common/view/languages.dart';
 import '../extensions/string_x.dart';
@@ -52,8 +53,8 @@ class SearchModel extends SafeChangeNotifier {
   Set<SearchType> get searchTypes => _searchTypes;
   AudioType _audioType = _initialAudioType;
   AudioType get audioType => _audioType;
-  void setAudioType(AudioType value) {
-    if (value == _audioType) return;
+  void setAudioType(AudioType? value) {
+    if (value == _audioType || value == null) return;
     _audioType = value;
     _searchTypes = searchTypesFromAudioType(_audioType);
     setSearchType(_searchTypes.first);
@@ -117,10 +118,9 @@ class SearchModel extends SafeChangeNotifier {
   }
 
   List<PodcastGenre> getPodcastGenres(bool usePodcastIndex) {
-    final notSelected =
-        PodcastGenre.values.where((g) => g != podcastGenre).toList();
+    PodcastGenre.values.where((g) => g != podcastGenre).toList();
 
-    final list = [podcastGenre, ...notSelected];
+    const list = PodcastGenre.values;
 
     return usePodcastIndex
         ? list.where((e) => !e.name.contains('XXXITunesOnly')).toList()
@@ -144,18 +144,19 @@ class SearchModel extends SafeChangeNotifier {
   Future<LocalSearchResult?> localSearch(String? query) async {
     await Future.delayed(const Duration(microseconds: 1));
     final search = _localAudioService.search(_searchQuery);
-    return (
-      albums: search?.albums,
+    return LocalSearchResult(
       titles: search?.titles,
-      genres: search?.genres,
       artists: search?.artists,
+      albumArtists: search?.albumArtists,
+      albums: search?.albums,
+      genres: search?.genres,
       playlists: (query != null && query.isNotEmpty)
           ? _libraryService.playlists.keys
               .where(
                 (e) => e.toLowerCase().contains(query.toLowerCase()),
               )
               .toList()
-          : null
+          : null,
     );
   }
 
@@ -259,7 +260,9 @@ class SearchModel extends SafeChangeNotifier {
       SearchType.radioName => await radioNameSearch(_searchQuery)
           .then(
             (v) => setRadioSearchResult(
-              v?.map((e) => Audio.fromStation(e)).toList(),
+              _searchQuery == null || _searchQuery!.isEmpty
+                  ? null
+                  : v?.map((e) => Audio.fromStation(e)).toList(),
             ),
           )
           .then((_) => _loading = false),
@@ -310,7 +313,11 @@ class SearchModel extends SafeChangeNotifier {
               setSearchType(SearchType.localAlbum);
             } else if (localSearchResult?.artists?.isNotEmpty == true) {
               setSearchType(SearchType.localArtist);
-            } else if (localSearchResult?.genres?.isNotEmpty == true) {
+            }
+            // else if (localSearchResult?.albumArtists?.isNotEmpty == true) {
+            //   setSearchType(SearchType.localAlbumArtist);
+            // }
+            else if (localSearchResult?.genres?.isNotEmpty == true) {
               setSearchType(SearchType.localGenreName);
             } else if (localSearchResult?.playlists?.isNotEmpty == true) {
               setSearchType(SearchType.localPlaylists);

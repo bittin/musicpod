@@ -1,22 +1,22 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/yaru.dart';
 
 import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/adaptive_container.dart';
 import '../../common/view/audio_page_header.dart';
 import '../../common/view/audio_page_type.dart';
+import '../../common/view/audio_tile_option_button.dart';
 import '../../common/view/avatar_play_button.dart';
-import '../../common/view/explore_online_popup.dart';
 import '../../common/view/header_bar.dart';
 import '../../common/view/icons.dart';
 import '../../common/view/like_all_icon.dart';
-import '../../common/view/round_image_container.dart';
 import '../../common/view/search_button.dart';
 import '../../common/view/sliver_audio_page_control_panel.dart';
 import '../../common/view/sliver_audio_tile_list.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../constants.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
@@ -25,6 +25,7 @@ import '../../search/search_type.dart';
 import '../local_audio_model.dart';
 import 'album_page.dart';
 import 'album_view.dart';
+import 'artist_round_image_container.dart';
 import 'genre_page.dart';
 
 class ArtistPage extends StatelessWidget with WatchItMixin {
@@ -69,7 +70,6 @@ class ArtistPage extends StatelessWidget with WatchItMixin {
         );
 
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         adaptive: true,
         actions: [
@@ -77,7 +77,7 @@ class ArtistPage extends StatelessWidget with WatchItMixin {
             padding: appBarSingleActionSpacing,
             child: SearchButton(
               onPressed: () {
-                di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                di<LibraryModel>().push(pageId: kSearchPageId);
                 final searchmodel = di<SearchModel>();
                 searchmodel
                   ..setAudioType(AudioType.local)
@@ -101,11 +101,10 @@ class ArtistPage extends StatelessWidget with WatchItMixin {
                   child: AudioPageHeader(
                     imageRadius: BorderRadius.circular(10000),
                     title: artistAudios?.firstOrNull?.artist ?? '',
-                    image: RoundImageContainer(
-                      images: artistAudios == null
-                          ? null
-                          : model.findLocalCovers(audios: artistAudios!),
-                      fallBackText: pageId,
+                    image: ArtistRoundImageContainer(
+                      artistAudios: artistAudios,
+                      height: kMaxAudioPageHeaderHeight,
+                      width: kMaxAudioPageHeaderHeight,
                     ),
                     subTitle: artistAudios?.firstOrNull?.genre,
                     label: context.l10n.artist,
@@ -123,7 +122,10 @@ class ArtistPage extends StatelessWidget with WatchItMixin {
               if (useGridView)
                 SliverPadding(
                   padding:
-                      getAdaptiveHorizontalPadding(constraints: constraints),
+                      getAdaptiveHorizontalPadding(constraints: constraints)
+                          .copyWith(
+                    bottom: bottomPlayerPageGap,
+                  ),
                   sliver: AlbumsView(
                     albums: albums,
                   ),
@@ -131,7 +133,10 @@ class ArtistPage extends StatelessWidget with WatchItMixin {
               else
                 SliverPadding(
                   padding:
-                      getAdaptiveHorizontalPadding(constraints: constraints),
+                      getAdaptiveHorizontalPadding(constraints: constraints)
+                          .copyWith(
+                    bottom: bottomPlayerPageGap,
+                  ),
                   sliver: SliverAudioTileList(
                     audios: artistAudios!,
                     pageId: pageId,
@@ -181,7 +186,15 @@ class _ArtistPageControlPanel extends StatelessWidget with WatchItMixin {
           ),
           AvatarPlayButton(audios: audios, pageId: pageId),
           LikeAllIcon(audios: audios),
-          ExploreOnlinePopup(text: pageId),
+          AudioTileOptionButton(
+            audios: audios,
+            playlistId: pageId,
+            allowRemove: false,
+            selected: false,
+            searchTerm: audios.first.artist ?? '',
+            title: Text(audios.first.artist ?? ''),
+            subTitle: Text(audios.first.genre ?? ''),
+          ),
         ],
       ),
     );

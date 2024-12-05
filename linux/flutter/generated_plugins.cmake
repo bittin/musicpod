@@ -9,7 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   irondash_engine_context
   media_kit_libs_linux
   media_kit_video
-  screen_retriever
+  screen_retriever_linux
   super_native_extensions
   system_theme
   url_launcher_linux
@@ -19,7 +19,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
   flutter_discord_rpc
-  media_kit_native_event_loop
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

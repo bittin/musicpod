@@ -8,7 +8,7 @@ import '../../l10n/l10n.dart';
 import '../../local_audio/local_audio_model.dart';
 import '../../local_audio/view/failed_imports_content.dart';
 import '../../local_audio/view/local_audio_body.dart';
-import '../../local_audio/view/local_audio_view.dart';
+import '../../local_audio/local_audio_view.dart';
 import '../search_model.dart';
 import '../search_type.dart';
 
@@ -42,6 +42,7 @@ class _SliverLocalSearchResultState extends State<SliverLocalSearchResult> {
       (SearchModel m) => switch (m.searchType) {
         SearchType.localAlbum => LocalAudioView.albums,
         SearchType.localArtist => LocalAudioView.artists,
+        // SearchType.localAlbumArtist => LocalAudioView.albumArtists,
         SearchType.localTitle => LocalAudioView.titles,
         SearchType.localGenreName => LocalAudioView.genres,
         _ => LocalAudioView.playlists,
@@ -52,6 +53,9 @@ class _SliverLocalSearchResultState extends State<SliverLocalSearchResult> {
         watchPropertyValue((SearchModel m) => m.localSearchResult?.titles);
     final artists =
         watchPropertyValue((SearchModel m) => m.localSearchResult?.artists);
+    final albumArtists = watchPropertyValue(
+      (SearchModel m) => m.localSearchResult?.albumArtists,
+    );
     final albums =
         watchPropertyValue((SearchModel m) => m.localSearchResult?.albums);
     final genresResult =
@@ -74,6 +78,7 @@ class _SliverLocalSearchResultState extends State<SliverLocalSearchResult> {
       localAudioView: localAudioView,
       titles: titles,
       artists: artists,
+      albumArtists: albumArtists,
       albums: albums,
       genres: genresResult,
       playlists: playlistsResult,

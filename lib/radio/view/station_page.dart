@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/yaru.dart';
 
 import '../../app/connectivity_model.dart';
+
 import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/adaptive_container.dart';
 import '../../common/view/audio_page_header.dart';
 import '../../common/view/avatar_play_button.dart';
@@ -13,6 +14,7 @@ import '../../common/view/safe_network_image.dart';
 import '../../common/view/search_button.dart';
 import '../../common/view/sliver_audio_page_control_panel.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../constants.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
@@ -38,7 +40,6 @@ class StationPage extends StatelessWidget with WatchItMixin {
     if (!isOnline) return const OfflinePage();
 
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         adaptive: true,
         actions: [
@@ -46,7 +47,7 @@ class StationPage extends StatelessWidget with WatchItMixin {
             padding: appBarSingleActionSpacing,
             child: SearchButton(
               onPressed: () {
-                di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                di<LibraryModel>().push(pageId: kSearchPageId);
                 final searchModel = di<SearchModel>();
                 if (searchModel.audioType != AudioType.radio) {
                   searchModel
@@ -100,12 +101,16 @@ class StationPage extends StatelessWidget with WatchItMixin {
                 ),
               ),
               SliverPadding(
-                padding: getAdaptiveHorizontalPadding(constraints: constraints),
+                padding: getAdaptiveHorizontalPadding(constraints: constraints)
+                    .copyWith(
+                  bottom: bottomPlayerPageGap,
+                ),
                 sliver: SliverRadioHistoryList(
                   filter: station.title,
                   emptyMessage: const SizedBox.shrink(),
                   emptyIcon: const SizedBox.shrink(),
                   padding: radioHistoryListPadding,
+                  allowNavigation: false,
                 ),
               ),
             ],

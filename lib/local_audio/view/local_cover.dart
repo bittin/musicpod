@@ -1,10 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:watch_it/watch_it.dart';
 
-import '../cover_store.dart';
+import '../local_cover_model.dart';
 
-class LocalCover extends StatefulWidget {
+class LocalCover extends StatefulWidget with WatchItStatefulWidgetMixin {
   const LocalCover({
     super.key,
     required this.albumId,
@@ -30,14 +31,16 @@ class LocalCover extends StatefulWidget {
 
 class _LocalCoverState extends State<LocalCover> {
   late Future<Uint8List?> _future;
+  Uint8List? _cover;
 
   @override
   void initState() {
     super.initState();
-    final init = CoverStore().get(widget.albumId);
-    _future = init != null
-        ? Future.value(init)
-        : getCover(
+    final localCoverModel = di<LocalCoverModel>();
+    _cover = localCoverModel.get(widget.albumId);
+    _future = _cover != null
+        ? Future.value(_cover)
+        : localCoverModel.getCover(
             albumId: widget.albumId,
             path: widget.path,
           );
@@ -45,38 +48,51 @@ class _LocalCoverState extends State<LocalCover> {
 
   @override
   Widget build(BuildContext context) {
+    if (_cover == null) {
+      watchPropertyValue((LocalCoverModel m) => m.storeLength);
+      _cover = di<LocalCoverModel>().get(widget.albumId);
+    }
     final fit = widget.fit ?? BoxFit.fitHeight;
     const medium = FilterQuality.medium;
 
-    Widget child = FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.hasError) {
-          return Container(
-            key: const ValueKey(0),
-            child: widget.fallback,
-          );
-        } else {
-          return Image.memory(
-            key: const ValueKey(1),
-            snapshot.data!,
+    Widget child = _cover != null
+        ? Image.memory(
+            key: ValueKey(widget.albumId),
+            _cover!,
             fit: fit,
             height: widget.dimension ?? widget.height,
             width: widget.width,
             filterQuality: medium,
+          )
+        : FutureBuilder(
+            future: _future,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || snapshot.hasError) {
+                return Container(
+                  key: ValueKey('${widget.albumId}1'),
+                  child: widget.fallback,
+                );
+              } else {
+                return Image.memory(
+                  key: ValueKey('${widget.albumId}2'),
+                  snapshot.data!,
+                  fit: fit,
+                  height: widget.dimension ?? widget.height,
+                  width: widget.width,
+                  filterQuality: medium,
+                );
+              }
+            },
           );
-        }
-      },
-    );
 
     return SizedBox(
       height: widget.dimension ?? widget.height,
       width: widget.dimension ?? widget.width,
       child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 200),
         transitionBuilder: (Widget child, Animation<double> animation) =>
             FadeTransition(opacity: animation, child: child),
-        reverseDuration: const Duration(milliseconds: 500),
+        reverseDuration: const Duration(milliseconds: 200),
         child: child,
       ),
     );

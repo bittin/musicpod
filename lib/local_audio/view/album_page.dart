@@ -4,14 +4,14 @@ import 'package:watch_it/watch_it.dart';
 
 import '../../common/data/audio.dart';
 import '../../common/view/audio_page_type.dart';
+import '../../common/view/audio_tile_option_button.dart';
 import '../../common/view/avatar_play_button.dart';
 import '../../common/view/cover_background.dart';
-import '../../common/view/explore_online_popup.dart';
 import '../../common/view/icons.dart';
 import '../../common/view/side_bar_fall_back_image.dart';
 import '../../common/view/sliver_audio_page.dart';
 import '../../common/view/theme.dart';
-import '../../constants.dart';
+import '../../common/view/ui_constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
@@ -58,6 +58,7 @@ class AlbumPage extends StatelessWidget {
       pageTitle: album.firstWhereOrNull((e) => e.album != null)?.album,
       pageSubTitle: album.firstWhereOrNull((e) => e.artist != null)?.artist,
       onPageSubTitleTab: onArtistTap,
+      onPageLabelTab: onArtistTap,
       controlPanel: AlbumPageControlButton(album: album, id: id),
     );
   }
@@ -164,8 +165,15 @@ class AlbumPageControlButton extends StatelessWidget {
             },
           ),
           AvatarPlayButton(audios: album, pageId: id),
-          ExploreOnlinePopup(
-            text: '${album.firstOrNull?.artist} - ${album.firstOrNull?.album}',
+          AudioTileOptionButton(
+            audios: album,
+            playlistId: id,
+            allowRemove: false,
+            selected: false,
+            searchTerm:
+                '${album.firstOrNull?.artist} - ${album.firstOrNull?.album}',
+            title: Text('${album.firstOrNull?.artist}'),
+            subTitle: Text('${album.firstOrNull?.album}'),
           ),
         ],
       ),

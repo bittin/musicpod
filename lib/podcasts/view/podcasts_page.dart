@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/theme.dart';
 
-import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/header_bar.dart';
 import '../../common/view/search_button.dart';
 import '../../common/view/theme.dart';
@@ -35,7 +34,6 @@ class _PodcastsPageState extends State<PodcastsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         titleSpacing: 0,
         adaptive: true,
@@ -45,7 +43,7 @@ class _PodcastsPageState extends State<PodcastsPage> {
             child: SearchButton(
               onPressed: () {
                 final searchModel = di<SearchModel>();
-                di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                di<LibraryModel>().push(pageId: kSearchPageId);
                 if (searchModel.audioType != AudioType.podcast) {
                   searchModel
                     ..setAudioType(AudioType.podcast)

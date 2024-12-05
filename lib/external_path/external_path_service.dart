@@ -6,10 +6,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:gtk/gtk.dart';
 import 'package:m3u_parser_nullsafe/m3u_parser_nullsafe.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pls/pls.dart';
-import 'package:yaru/yaru.dart';
 
+import '../app_config.dart';
 import '../common/data/audio.dart';
+import '../common/data/audio_type.dart';
+import '../common/logging.dart';
 import '../player/player_service.dart';
 
 class ExternalPathService {
@@ -40,13 +43,14 @@ class ExternalPathService {
       return;
     }
     try {
-      readMetadata(File(path), getImage: true).then(
-        (data) => _playerService.startPlaylist(
-          listName: path,
-          audios: [Audio.fromMetadata(path: path, data: data)],
-        ),
+      final metadata = readMetadata(File(path), getImage: true);
+      _playerService.startPlaylist(
+        listName: path,
+        audios: [Audio.fromMetadata(path: path, data: metadata)],
       );
-    } catch (_) {}
+    } on Exception catch (e) {
+      printMessageInDebugMode(e);
+    }
   }
 
   void dispose() {
@@ -58,14 +62,15 @@ class ExternalPathService {
       try {
         openFile().then((xfile) {
           if (xfile?.path == null) return;
-          readMetadata(File(xfile!.path), getImage: true).then(
-            (metadata) => _playerService.startPlaylist(
-              listName: xfile.path,
-              audios: [Audio.fromMetadata(path: xfile.path, data: metadata)],
-            ),
+          final metadata = readMetadata(File(xfile!.path), getImage: true);
+          _playerService.startPlaylist(
+            listName: xfile.path,
+            audios: [Audio.fromMetadata(path: xfile.path, data: metadata)],
           );
         });
-      } on Exception catch (_) {}
+      } on Exception catch (e) {
+        printMessageInDebugMode(e);
+      }
     }
   }
 
@@ -84,7 +89,9 @@ class ExternalPathService {
         } else if (path.endsWith('.pls')) {
           audios = await _parsePlsPlaylist(path);
         }
-      } on Exception catch (_) {}
+      } on Exception catch (e) {
+        printMessageInDebugMode(e);
+      }
     }
     return (path, audios);
   }
@@ -106,7 +113,7 @@ class ExternalPathService {
         audios.add(
           Audio.fromMetadata(
             path: path,
-            data: await readMetadata(
+            data: readMetadata(
               File(e.link.replaceAll('file://', '')),
               getImage: true,
             ),
@@ -153,7 +160,7 @@ class ExternalPathService {
         audios.add(
           Audio.fromMetadata(
             path: e.file!,
-            data: await readMetadata(File(e.file!), getImage: true),
+            data: readMetadata(File(e.file!), getImage: true),
           ),
         );
       }
@@ -163,7 +170,7 @@ class ExternalPathService {
   }
 
   Future<String?> getPathOfDirectory() async {
-    if (isMobile) {
+    if (isMobilePlatform && await _androidPermissionsGranted()) {
       return FilePicker.platform.getDirectoryPath();
     }
 
@@ -171,5 +178,30 @@ class ExternalPathService {
       return getDirectoryPath();
     }
     return null;
+  }
+
+  Future<bool> _androidPermissionsGranted() async {
+    final mediaLibraryIsGranted = (await Permission.mediaLibrary
+            .onDeniedCallback(() {})
+            .onGrantedCallback(() {})
+            .onPermanentlyDeniedCallback(() {})
+            .onRestrictedCallback(() {})
+            .onLimitedCallback(() {})
+            .onProvisionalCallback(() {})
+            .request())
+        .isGranted;
+
+    final manageExternalStorageIsGranted = (await Permission
+            .manageExternalStorage
+            .onDeniedCallback(() {})
+            .onGrantedCallback(() {})
+            .onPermanentlyDeniedCallback(() {})
+            .onRestrictedCallback(() {})
+            .onLimitedCallback(() {})
+            .onProvisionalCallback(() {})
+            .request())
+        .isGranted;
+
+    return mediaLibraryIsGranted && manageExternalStorageIsGranted;
   }
 }

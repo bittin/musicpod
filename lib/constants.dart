@@ -1,122 +1,28 @@
-import 'package:flutter/material.dart';
-import 'package:yaru/constants.dart';
-
+// app names, IDs and links
 const kAppName = 'musicpod';
-
-const kAppId = 'org.feichtmeier.Musicpod';
-
-const kDiscordApplicationId = '1235321910221602837';
-
-const kLinuxDBusName = 'org.mpris.MediaPlayer2.musicpod';
-
-const kAndroidChannelId = 'org.feichtmeier.musicpod.channel.audio';
-
-const kRepoUrl = 'http://github.com/ubuntu-flutter-community/musicpod';
-
-const kSnapDesktopEntry = '/var/lib/snapd/desktop/applications/musicpod';
-
-const kFlatPakDesktopEntry = '';
-
-const kDesktopEntry = kSnapDesktopEntry;
-
-const kGitHubShortLink = 'ubuntu-flutter-community/musicpod';
-
 const kAppTitle = 'MusicPod';
-
-const kTinyButtonSize = 30.0;
-
-const kTinyButtonIconSize = 13.0;
-
-const kSearchBarWidth = 335.0;
-
-const kSnackBarWidth = 500.0;
-
-const fullHeightPlayerImageSize = 300.0;
-
-const kMaxAudioPageHeaderHeight = 200.0;
-
-const kMinAudioPageHeaderHeight = 0.0;
-
-const kSnackBarDuration = Duration(seconds: 10);
-
-const kMobileAudioTilePadding = EdgeInsets.symmetric(horizontal: 20);
-
-const kDesktopAudioTilePadding = EdgeInsets.symmetric(horizontal: 20);
-
-const kAudioTileTrackPadding = EdgeInsets.only(right: 20);
-
-const kAudioTileSpacing = EdgeInsets.only(right: 10.0);
-
-const kAudioTrackWidth = 40.0;
-
-const kSideBarThreshHold = 1500.0;
-
-const kSideBarPlayerWidth = 500.0;
-
-const kFallbackThumbnail =
+const kAppId = 'org.feichtmeier.Musicpod';
+const kAndroidAppId = 'org.feichtmeier.musicpod';
+const kDiscordApplicationId = '1235321910221602837';
+const kLinuxDBusName = 'org.mpris.MediaPlayer2.musicpod';
+const kAndroidChannelId = 'org.feichtmeier.musicpod.channel.audio';
+const kRepoUrl = 'http://github.com/ubuntu-flutter-community/musicpod';
+const kSponsorLink = 'https://github.com/sponsors/Feichtmeier';
+const kGitHubShortLink = 'ubuntu-flutter-community/musicpod';
+const kFallbackThumbnailUrl =
     'https://raw.githubusercontent.com/ubuntu-flutter-community/musicpod/main/snap/gui/musicpod.png';
 
-const kGridPadding = EdgeInsets.only(
-  top: 0,
-  bottom: kYaruPagePadding,
-  left: kYaruPagePadding - 5,
-  right: kYaruPagePadding - 5,
-);
-const kMobileGridPadding = EdgeInsets.only(
-  top: 0,
-  bottom: kYaruPagePadding,
-  left: kYaruPagePadding - 5,
-  right: kYaruPagePadding - 5,
-);
+// HTTP headers
+const kMusicBrainzHeaders = {
+  'Accept': 'application/json',
+  'User-Agent': '$kAppTitle ($kRepoUrl)',
+};
 
-const kHeaderPadding = EdgeInsets.only(
-  top: kYaruPagePadding,
-  left: kYaruPagePadding,
-  right: kYaruPagePadding,
-  bottom: kYaruPagePadding - 5,
-);
+const kInternetArchiveHeaders = {
+  'User-Agent': '$kAppTitle ($kRepoUrl)',
+};
 
-const kAudioCardDimension = 130.0;
-
-const kAudioCardBottomHeight = 30.0;
-
-const kMasterDetailBreakPoint = 720.0;
-
-const kMasterDetailSideBarWidth = 250.0;
-
-const kAdaptivContainerBreakPoint = 1200.0;
-
-const kAudioCardGridDelegate = SliverGridDelegateWithMaxCrossAxisExtent(
-  maxCrossAxisExtent: kAudioCardDimension + 40,
-  mainAxisExtent: kAudioCardDimension + kAudioCardBottomHeight + 8,
-  mainAxisSpacing: 0,
-  crossAxisSpacing: 10,
-);
-
-const kMobileAudioCardGridDelegate = SliverGridDelegateWithMaxCrossAxisExtent(
-  maxCrossAxisExtent: kAudioCardDimension,
-  mainAxisExtent: kAudioCardDimension + kAudioCardBottomHeight + 5,
-  mainAxisSpacing: 0,
-  crossAxisSpacing: 10,
-);
-
-const kDiskGridDelegate = SliverGridDelegateWithMaxCrossAxisExtent(
-  maxCrossAxisExtent: kAudioCardDimension + 10,
-  mainAxisSpacing: 10,
-  crossAxisSpacing: 10,
-);
-
-const kAudioControlPanelPadding = EdgeInsets.only(
-  top: kYaruPagePadding / 2,
-  left: kYaruPagePadding,
-  right: kYaruPagePadding,
-  bottom: kYaruPagePadding / 2,
-);
-
-const kAudioQueueThreshHold = 100;
-
-const kMainPageIconPadding = EdgeInsets.only(right: 4.0);
-
+// persistence and library IDs and filenames
 const kLikedAudiosFileName = 'likedAudios.json';
 const kRadioTagFavsFileName = 'tagFavs.json';
 const kCountryFavsFileName = 'countryfavs.json';
@@ -148,6 +54,13 @@ const kRadioIndex = 'radioIndex';
 const kPodcastIndex = 'podcastIndex';
 const kNeverShowImportFails = 'neverShowImportFails';
 const kEnableDiscordRPC = 'enableDiscordRPC';
+const kEnableLastFmScrobbling = 'enableLastFmScrobbling';
+const kLastFmApiKey = 'lastFmApiKey';
+const klastFmSecret = 'lastFmSecret';
+const kLastFmSessionKey = 'lastFmSessionKey';
+const kLastFmUsername = 'lastFmUsername';
+const kEnableListenBrainzScrobbling = 'enableListenBrainzScrobbling';
+const kListenBrainzApiKey = 'listenBrainzApiKey';
 const kLastCountryCode = 'lastCountryCode';
 const kLastLanguageCode = 'lastLanguageCode';
 const kSearchResult = 'searchResult';
@@ -169,26 +82,5 @@ const kAscendingFeeds = 'ascendingfeed:::';
 const kPatchNotesDisposed = 'kPatchNotesDisposed';
 const kCloseBtnAction = 'closeBtnAction';
 const kUseMoreAnimations = 'useMoreAnimations';
-
-const shops = <String, String>{
-  'https://us.7digital.com/': '7digital',
-  'https://www.hdtracks.com/': 'hdtracks',
-  'https://www.qobuz.com': 'qobuz',
-  'https://www.amazon.com/music/player': 'Amazon Music',
-  'https://bandcamp.com/tag/buy': 'Bandcamp',
-};
-
-const kSponsorLink = 'https://github.com/sponsors/Feichtmeier';
-
-const kMusicBrainzHeaders = {
-  'Accept': 'application/json',
-  'User-Agent': '$kAppTitle ($kRepoUrl)',
-};
-
-const kInternetArchiveHeaders = {
-  'User-Agent': '$kAppTitle ($kRepoUrl)',
-};
-
-const kAudioHeaderDescriptionWidth = 400.0;
-
-const kShowLeadingThreshold = 3000;
+const kShowPositionDuration = 'showPositionDuration';
+const kSettingsPageId = 'settings';

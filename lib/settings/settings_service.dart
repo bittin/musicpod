@@ -17,92 +17,96 @@ class SettingsService {
   final SharedPreferences _preferences;
   final _propertiesChangedController = StreamController<bool>.broadcast();
   Stream<bool> get propertiesChanged => _propertiesChangedController.stream;
+  void notify(bool saved) {
+    if (saved) _propertiesChangedController.add(true);
+  }
 
   int get themeIndex => _preferences.getInt(kThemeIndex) ?? 0;
   void setThemeIndex(int value) {
-    _preferences.setInt(kThemeIndex, value).then(
-      (saved) {
-        if (saved) _propertiesChangedController.add(true);
-      },
-    );
+    _preferences.setInt(kThemeIndex, value).then(notify);
+  }
+
+  int get localAudioIndex => _preferences.getInt(kLocalAudioIndex) ?? 0;
+  void setLocalAudioIndex(int value) {
+    _preferences.setInt(kLocalAudioIndex, value).then(notify);
   }
 
   bool get neverShowFailedImports =>
       _preferences.getBool(kNeverShowImportFails) ?? false;
   void setNeverShowFailedImports(bool value) {
-    _preferences.setBool(kNeverShowImportFails, value).then(
-      (saved) {
-        if (saved) _propertiesChangedController.add(true);
-      },
-    );
+    _preferences.setBool(kNeverShowImportFails, value).then(notify);
   }
+
+  bool get enableLastFmScrobbling =>
+      _preferences.getBool(kEnableLastFmScrobbling) ?? false;
+  String? get lastFmApiKey => _preferences.getString(kLastFmApiKey);
+  String? get lastFmSecret => _preferences.getString(klastFmSecret);
+  String? get lastFmSessionKey => _preferences.getString(kLastFmSessionKey);
+  String? get lastFmUsername => _preferences.getString(kLastFmUsername);
+  void setEnableLastFmScrobbling(bool value) =>
+      _preferences.setBool(kEnableLastFmScrobbling, value).then(notify);
+
+  void setLastFmApiKey(String value) =>
+      _preferences.setString(kLastFmApiKey, value).then(notify);
+
+  void setLastFmSecret(String value) =>
+      _preferences.setString(klastFmSecret, value).then(notify);
+
+  void setLastFmSessionKey(String value) =>
+      _preferences.setString(kLastFmSessionKey, value).then(notify);
+
+  void setLastFmUsername(String value) =>
+      _preferences.setString(kLastFmUsername, value).then(notify);
+
+  bool get enableListenBrainzScrobbling =>
+      _preferences.getBool(kEnableListenBrainzScrobbling) ?? false;
+  String? get listenBrainzApiKey => _preferences.getString(kListenBrainzApiKey);
+  void setEnableListenBrainzScrobbling(bool value) =>
+      _preferences.setBool(kEnableListenBrainzScrobbling, value).then(notify);
+  void setListenBrainzApiKey(String value) =>
+      _preferences.setString(kListenBrainzApiKey, value).then(notify);
 
   bool get enableDiscordRPC => _preferences.getBool(kEnableDiscordRPC) ?? false;
-  void setEnableDiscordRPC(bool value) {
-    _preferences.setBool(kEnableDiscordRPC, value).then(
-      (saved) {
-        if (saved) _propertiesChangedController.add(true);
-      },
-    );
-  }
+  void setEnableDiscordRPC(bool value) =>
+      _preferences.setBool(kEnableDiscordRPC, value).then(notify);
 
-  // TODO: check how this increases cpu usage
   bool get useMoreAnimations =>
       _preferences.getBool(kUseMoreAnimations) ?? !Platform.isLinux;
-  void setUseMoreAnimations(bool value) {
-    _preferences.setBool(kUseMoreAnimations, value).then(
-      (saved) {
-        if (saved) _propertiesChangedController.add(true);
-      },
-    );
-  }
+  void setUseMoreAnimations(bool value) =>
+      _preferences.setBool(kUseMoreAnimations, value).then(notify);
 
   bool recentPatchNotesDisposed(String version) =>
       _preferences.getString(kPatchNotesDisposed) == version;
 
   Future<void> disposePatchNotes(String version) async =>
-      _preferences.setString(kPatchNotesDisposed, version).then(
-        (saved) {
-          if (saved) _propertiesChangedController.add(true);
-        },
-      );
+      _preferences.setString(kPatchNotesDisposed, version).then(notify);
 
   bool get usePodcastIndex => _preferences.getBool(kUsePodcastIndex) ?? false;
-  Future<void> setUsePodcastIndex(bool value) async {
-    return _preferences.setBool(kUsePodcastIndex, value).then((value) {
-      if (value) _propertiesChangedController.add(true);
-    });
-  }
+  Future<void> setUsePodcastIndex(bool value) async =>
+      _preferences.setBool(kUsePodcastIndex, value).then(notify);
 
   String? get podcastIndexApiKey => _preferences.getString(kPodcastIndexApiKey);
-  void setPodcastIndexApiKey(String value) {
-    _preferences.setString(kPodcastIndexApiKey, value).then((saved) {
-      if (saved) _propertiesChangedController.add(true);
-    });
-  }
+  void setPodcastIndexApiKey(String value) =>
+      _preferences.setString(kPodcastIndexApiKey, value).then(notify);
 
   String? get podcastIndexApiSecret =>
       _preferences.getString(kPodcastIndexApiSecret);
-  void setPodcastIndexApiSecret(String value) {
-    _preferences.setString(kPodcastIndexApiSecret, value).then((saved) {
-      if (saved) _propertiesChangedController.add(true);
-    });
-  }
+  void setPodcastIndexApiSecret(String value) =>
+      _preferences.setString(kPodcastIndexApiSecret, value).then(notify);
 
   String? get directory => _preferences.getString(kDirectoryProperty);
-  Future<void> setDirectory(String directory) async {
-    await _preferences.setString(kDirectoryProperty, directory).then((saved) {
-      if (saved) _propertiesChangedController.add(true);
-    });
-  }
+  Future<void> setDirectory(String directory) async =>
+      _preferences.setString(kDirectoryProperty, directory).then(notify);
 
   String? get downloadsDir =>
       _preferences.getString(kDownloadsCustomDir) ?? _downloadsDefaultDir;
-  Future<void> setDownloadsCustomDir(String directory) async {
-    await _preferences.setString(kDownloadsCustomDir, directory).then((saved) {
-      if (saved) _propertiesChangedController.add(true);
-    });
-  }
+  Future<void> setDownloadsCustomDir(String directory) async =>
+      _preferences.setString(kDownloadsCustomDir, directory).then(notify);
+
+  bool get showPositionDuration =>
+      _preferences.getBool(kShowPositionDuration) ?? false;
+  Future<void> setShowPositionDuration(bool value) async =>
+      _preferences.setBool(kShowPositionDuration, value).then(notify);
 
   CloseBtnAction get closeBtnActionIndex =>
       _preferences.getString(kCloseBtnAction) == null
@@ -113,11 +117,7 @@ class SettingsService {
               orElse: () => CloseBtnAction.alwaysAsk,
             );
   void setCloseBtnActionIndex(CloseBtnAction value) {
-    _preferences.setString(kCloseBtnAction, value.toString()).then(
-      (saved) {
-        if (saved) _propertiesChangedController.add(true);
-      },
-    );
+    _preferences.setString(kCloseBtnAction, value.toString()).then(notify);
   }
 
   Future<void> dispose() async => _propertiesChangedController.close();

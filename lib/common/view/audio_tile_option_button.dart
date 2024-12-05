@@ -1,103 +1,126 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 import 'package:yaru/yaru.dart';
 
+import '../../app_config.dart';
+import '../../constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
+import '../../player/player_model.dart';
 import '../../playlists/view/add_to_playlist_dialog.dart';
 import '../data/audio.dart';
+import '../data/audio_type.dart';
+import 'audio_tile_bottom_sheet.dart';
 import 'icons.dart';
+import 'meta_data_dialog.dart';
+import 'modals.dart';
 import 'snackbars.dart';
 import 'stream_provider_share_button.dart';
-import 'theme.dart';
 
 class AudioTileOptionButton extends StatelessWidget {
   const AudioTileOptionButton({
     super.key,
-    required this.audio,
+    required this.audios,
     required this.playlistId,
-    required this.insertIntoQueue,
     required this.allowRemove,
     required this.selected,
+    required this.searchTerm,
+    required this.title,
+    required this.subTitle,
+    this.icon,
   });
 
   final String playlistId;
-  final Audio audio;
-  final void Function()? insertIntoQueue;
-
+  final List<Audio> audios;
+  final String searchTerm;
   final bool allowRemove;
   final bool selected;
+  final Widget title;
+  final Widget subTitle;
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
     final theme = context.theme;
+    final l10n = context.l10n;
     final libraryModel = di<LibraryModel>();
 
+    if (isMobilePlatform) {
+      return AudioTileBottomSheetButton(
+        audios: audios,
+        allowRemove: allowRemove,
+        playlistId: playlistId,
+        searchTerm: searchTerm,
+        title: title,
+        subTitle: subTitle,
+        icon: icon,
+      );
+    }
+
     return PopupMenuButton(
-      tooltip: context.l10n.moreOptions,
+      tooltip: l10n.moreOptions,
       padding: EdgeInsets.zero,
       itemBuilder: (context) {
         return [
-          if (audio.audioType != AudioType.radio)
+          if (audios.none((e) => e.audioType == AudioType.radio))
             PopupMenuItem(
               onTap: () {
-                insertIntoQueue?.call();
+                di<PlayerModel>().insertIntoQueue(audios);
                 showSnackBar(
                   context: context,
                   content: Text(
-                    '${context.l10n.addedTo} ${context.l10n.queue}: ${audio.artist} - ${audio.title}',
+                    '${l10n.addedTo} ${l10n.queue}: $searchTerm',
                   ),
                 );
               },
               child: YaruTile(
                 leading: Icon(Iconz.insertIntoQueue),
-                title: Text(context.l10n.playNext),
+                title: Text(l10n.playNext),
               ),
             ),
-          if (audio.audioType != AudioType.radio)
-            if (allowRemove)
-              PopupMenuItem(
-                onTap: () =>
-                    libraryModel.removeAudioFromPlaylist(playlistId, audio),
-                child: YaruTile(
-                  leading: Icon(Iconz.remove),
-                  title: Text('${context.l10n.removeFrom} $playlistId'),
+          if (allowRemove)
+            PopupMenuItem(
+              onTap: () => playlistId == kLikedAudiosPageId
+                  ? libraryModel.removeLikedAudios(audios)
+                  : libraryModel.removeAudiosFromPlaylist(
+                      id: playlistId,
+                      audios: audios,
+                    ),
+              child: YaruTile(
+                leading: Icon(Iconz.remove),
+                title: Text(
+                  '${l10n.removeFrom} ${playlistId == kLikedAudiosPageId ? l10n.likedSongs : playlistId}',
                 ),
               ),
-          if (audio.audioType != AudioType.radio)
+            ),
+          if (audios.none((e) => e.audioType == AudioType.radio))
             PopupMenuItem(
               onTap: () => showDialog(
                 context: context,
-                builder: (context) {
-                  return AddToPlaylistDialog(
-                    audio: audio,
-                    libraryModel: libraryModel,
-                  );
-                },
+                builder: (context) => AddToPlaylistDialog(audios: audios),
               ),
               child: YaruTile(
                 leading: Icon(Iconz.plus),
                 title: Text(
-                  '${context.l10n.addToPlaylist} ...',
+                  '${l10n.addToPlaylist} ...',
                 ),
               ),
             ),
           PopupMenuItem(
             onTap: () => showDialog(
               context: context,
-              builder: (context) {
-                return MetaDataDialog(audio: audio);
-              },
+              builder: (context) => MetaDataContent.dialog(audio: audios.first),
             ),
             child: YaruTile(
               leading: Icon(Iconz.info),
               title: Text(
-                '${context.l10n.showMetaData} ...',
+                '${l10n.showMetaData} ...',
               ),
             ),
           ),
-          if (audio.audioType != AudioType.radio)
+          if (audios.none((e) => e.audioType == AudioType.radio))
             PopupMenuItem(
               enabled: false,
               padding: EdgeInsets.zero,
@@ -110,91 +133,53 @@ class AudioTileOptionButton extends StatelessWidget {
                     iconColor: theme.colorScheme.onSurface,
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    text: '${audio.artist ?? ''} - ${audio.title ?? ''}',
+                    text: searchTerm,
                   ),
                 ),
               ),
             ),
         ];
       },
-      icon: Icon(Iconz.viewMore),
+      icon: icon ?? Icon(Iconz.viewMore),
     );
   }
 }
 
-class MetaDataDialog extends StatelessWidget {
-  const MetaDataDialog({super.key, required this.audio});
+class AudioTileBottomSheetButton extends StatelessWidget {
+  const AudioTileBottomSheetButton({
+    super.key,
+    required this.audios,
+    required this.allowRemove,
+    required this.playlistId,
+    required this.searchTerm,
+    required this.title,
+    required this.subTitle,
+    this.icon,
+  });
 
-  final Audio audio;
+  final List<Audio> audios;
+  final String searchTerm;
+  final bool allowRemove;
+  final String playlistId;
+  final Widget title;
+  final Widget subTitle;
+  final Widget? icon;
 
   @override
-  Widget build(BuildContext context) {
-    final radio = audio.audioType == AudioType.radio;
-
-    final items = <(String, String)>{
-      (
-        radio ? context.l10n.stationName : context.l10n.title,
-        '${audio.title}',
-      ),
-      (
-        radio ? context.l10n.tags : context.l10n.album,
-        '${radio ? audio.album?.replaceAll(',', ', ') : audio.album}',
-      ),
-      (
-        radio ? context.l10n.language : context.l10n.artist,
-        '${radio ? audio.language : audio.artist}',
-      ),
-      (
-        radio ? context.l10n.quality : context.l10n.albumArtists,
-        '${audio.albumArtist}',
-      ),
-      if (!radio)
-        (
-          context.l10n.trackNumber,
-          '${audio.trackNumber}',
+  Widget build(BuildContext context) => IconButton(
+        tooltip: context.l10n.moreOptions,
+        onPressed: () => showModal(
+          mode: ModalMode.platformModalMode,
+          context: context,
+          content: AudioTileBottomSheet(
+            searchTerm: searchTerm,
+            title: title,
+            subTitle: subTitle,
+            audios: audios,
+            allowRemove: allowRemove,
+            playlistId: playlistId,
+          ),
         ),
-      if (!radio)
-        (
-          context.l10n.diskNumber,
-          '${audio.discNumber}',
-        ),
-      (
-        radio ? context.l10n.clicks : context.l10n.totalDisks,
-        '${radio ? audio.clicks : audio.discTotal}',
-      ),
-      if (!radio)
-        (
-          context.l10n.genre,
-          '${audio.genre}',
-        ),
-      (
-        context.l10n.url,
-        (audio.url ?? ''),
-      ),
-    };
-
-    return AlertDialog(
-      title: yaruStyled
-          ? YaruDialogTitleBar(
-              title: Text(context.l10n.metadata),
-            )
-          : Center(child: Text(context.l10n.metadata)),
-      titlePadding:
-          yaruStyled ? EdgeInsets.zero : const EdgeInsets.only(top: 10),
-      contentPadding: const EdgeInsets.only(bottom: 12),
-      scrollable: true,
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: items
-            .map(
-              (e) => ListTile(
-                dense: true,
-                title: Text(e.$1),
-                subtitle: Text(e.$2),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
+        icon: icon ?? Icon(Iconz.viewMore),
+      );
 }

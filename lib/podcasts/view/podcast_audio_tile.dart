@@ -4,18 +4,20 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_it/watch_it.dart';
 import 'package:yaru/yaru.dart';
 
+import '../../app_config.dart';
 import '../../common/data/audio.dart';
 import '../../common/view/icons.dart';
 import '../../common/view/share_button.dart';
 import '../../common/view/snackbars.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../extensions/duration_x.dart';
 import '../../extensions/int_x.dart';
 import '../../l10n/l10n.dart';
 import '../../player/player_model.dart';
-import 'podcast_tile_play_button.dart';
 import 'download_button.dart';
+import 'podcast_tile_play_button.dart';
 
 class PodcastAudioTile extends StatelessWidget {
   const PodcastAudioTile({
@@ -74,7 +76,7 @@ class PodcastAudioTile extends StatelessWidget {
                 startPlaylist: startPlaylist,
                 removeUpdate: removeUpdate,
               ),
-              SizedBox(width: isMobile ? 15 : 25),
+              SizedBox(width: isMobilePlatform ? 15 : 25),
               Expanded(
                 child: _Center(
                   selected: selected,
@@ -90,10 +92,10 @@ class PodcastAudioTile extends StatelessWidget {
       child: Align(
         alignment: Alignment.centerLeft,
         child: Padding(
-          padding: isMobile
+          padding: isMobilePlatform
               ? const EdgeInsets.symmetric(horizontal: 10)
               : EdgeInsets.only(
-                  left: (avatarIconRadius * 2) + 30,
+                  left: (smallAvatarButtonRadius * 2) + 30,
                   right: 60,
                 ),
           child: Column(
@@ -122,7 +124,7 @@ class PodcastAudioTile extends StatelessWidget {
                           onPressed: () {
                             final text =
                                 '${audio.title != null ? '${audio.album} - ' : ''}${audio.title ?? ''}';
-                            playerModel.insertIntoQueue(audio);
+                            playerModel.insertIntoQueue([audio]);
                             showSnackBar(
                               context: context,
                               content:
@@ -234,10 +236,10 @@ class _Description extends StatelessWidget {
                     )
                   : Text(title ?? ''),
               contentPadding: EdgeInsets.only(
-                top: yaruStyled ? 0 : 20,
-                left: 20,
-                right: 20,
-                bottom: 20,
+                top: yaruStyled ? 0 : kLargestSpace,
+                left: kLargestSpace,
+                right: kLargestSpace,
+                bottom: kLargestSpace,
               ),
               children: [
                 SizedBox(

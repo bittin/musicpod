@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../../constants.dart';
+import '../../app_config.dart';
 import '../../extensions/build_context_x.dart';
 import '../../extensions/string_x.dart';
 import '../../l10n/l10n.dart';
@@ -27,6 +27,7 @@ class LanguageAutoComplete extends StatelessWidget {
     this.fillColor,
     this.contentPadding,
     this.suffixIcon,
+    this.autofocus = false,
   });
 
   final void Function(SimpleLanguage? language)? onSelected;
@@ -43,6 +44,7 @@ class LanguageAutoComplete extends StatelessWidget {
   final Color? fillColor;
   final EdgeInsets? contentPadding;
   final Widget? suffixIcon;
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +70,7 @@ class LanguageAutoComplete extends StatelessWidget {
               final hintText =
                   '${context.l10n.search}: ${context.l10n.language}';
               return TextField(
+                autofocus: autofocus,
                 maxLines: 1,
                 onTap: () {
                   textEditingController.selection = TextSelection(
@@ -111,7 +114,7 @@ class LanguageAutoComplete extends StatelessWidget {
               return Align(
                 alignment: Alignment.topLeft,
                 child: SizedBox(
-                  width: width ?? kSearchBarWidth,
+                  width: width ?? searchBarWidth,
                   height:
                       (options.length * 50) > 400 ? 400 : options.length * 50,
                   child: ClipRRect(

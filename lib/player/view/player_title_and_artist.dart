@@ -4,6 +4,7 @@ import 'package:watch_it/watch_it.dart';
 
 import '../../app/app_model.dart';
 import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/copy_clipboard_content.dart';
 import '../../common/view/snackbars.dart';
 import '../../common/view/theme.dart';
@@ -14,7 +15,9 @@ import '../../local_audio/view/album_page.dart';
 import '../../local_audio/view/artist_page.dart';
 import '../../podcasts/podcast_model.dart';
 import '../../radio/view/station_page.dart';
+import '../../settings/settings_model.dart';
 import '../player_model.dart';
+import 'player_track.dart';
 import 'player_view.dart';
 
 class PlayerTitleAndArtist extends StatelessWidget with WatchItMixin {
@@ -32,6 +35,8 @@ class PlayerTitleAndArtist extends StatelessWidget with WatchItMixin {
 
     final icyTitle =
         watchPropertyValue((PlayerModel m) => m.mpvMetaData?.icyTitle);
+    final showPositionDuration =
+        watchPropertyValue((SettingsModel m) => m.showPositionDuration);
 
     final appModel = di<AppModel>();
     final libraryModel = di<LibraryModel>();
@@ -113,6 +118,20 @@ class PlayerTitleAndArtist extends StatelessWidget with WatchItMixin {
             ),
           ),
         ),
+        if (playerPosition == PlayerPosition.bottom &&
+            audio?.audioType != AudioType.radio &&
+            showPositionDuration)
+          const Padding(
+            padding: EdgeInsets.only(top: 2, bottom: 5),
+            child: PlayerSimpleTrack(),
+          )
+        else
+          SizedBox(
+            height: switch (playerPosition) {
+              PlayerPosition.bottom => 3,
+              _ => 0,
+            },
+          ),
       ],
     );
   }
@@ -127,7 +146,7 @@ class PlayerTitleAndArtist extends StatelessWidget with WatchItMixin {
   TextStyle _fullHeightTitleTextStyle(ThemeData theme) {
     return TextStyle(
       fontWeight: largeTextWeight,
-      fontSize: 30,
+      fontSize: 26,
       color: theme.colorScheme.onSurface,
     );
   }

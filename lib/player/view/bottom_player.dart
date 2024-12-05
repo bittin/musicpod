@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/yaru.dart';
 
 import '../../app/app_model.dart';
 import '../../app/connectivity_model.dart';
-import '../../common/data/audio.dart';
+import '../../app_config.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/icons.dart';
 import '../../common/view/like_icon.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
 import '../../player/player_model.dart';
@@ -37,114 +38,102 @@ class BottomPlayer extends StatelessWidget with WatchItMixin {
     final isOnline = watchPropertyValue((ConnectivityModel m) => m.isOnline);
 
     final active = audio?.path != null || isOnline;
-    final showQueueButton = watchPropertyValue(
-      (PlayerModel m) =>
-          m.queue.length > 1 || audio?.audioType == AudioType.local,
-    );
 
-    final player = SizedBox(
-      height: bottomPlayerHeight,
-      child: Column(
-        children: [
-          PlayerTrack(
-            active: active,
-            bottomPlayer: true,
-          ),
-          InkWell(
-            onTap: () => appModel.setFullWindowMode(true),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 20),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: BottomPlayerImage(
-                        audio: audio,
-                        size: bottomPlayerHeight - 24,
-                        videoController: model.controller,
-                        isVideo: isVideo,
-                        isOnline: isOnline,
+    final children = [
+      PlayerTrack(
+        active: active,
+        bottomPlayer: true,
+      ),
+      InkWell(
+        onTap: () => appModel.setFullWindowMode(true),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: kLargestSpace),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: BottomPlayerImage(
+                    audio: audio,
+                    size: bottomPlayerDefaultHeight - 24,
+                    videoController: model.controller,
+                    isVideo: isVideo,
+                    isOnline: isOnline,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: Row(
+                  children: [
+                    const Flexible(
+                      flex: 5,
+                      child: PlayerTitleAndArtist(
+                        playerPosition: PlayerPosition.bottom,
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Row(
-                      children: [
-                        const Flexible(
-                          flex: 5,
-                          child: PlayerTitleAndArtist(
-                            playerPosition: PlayerPosition.bottom,
-                          ),
-                        ),
-                        if (!smallWindow)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: switch (audio?.audioType) {
-                              AudioType.local => LikeIcon(
-                                  audio: audio,
-                                  color: theme.colorScheme.onSurface,
-                                ),
-                              AudioType.radio => RadioLikeIcon(audio: audio),
-                              _ => const SizedBox.shrink(),
-                            },
-                          ),
-                      ],
-                    ),
-                  ),
-                  if (!smallWindow)
-                    Expanded(
-                      flex: 6,
-                      child: PlayerMainControls(active: active),
-                    ),
-                  if (!smallWindow)
-                    Flexible(
-                      flex: 4,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (audio?.audioType == AudioType.podcast)
-                            PlaybackRateButton(active: active),
-                          const VolumeSliderPopup(),
-                          if (showQueueButton) const QueueButton(),
-                          IconButton(
-                            tooltip: context.l10n.fullWindow,
-                            icon: Icon(
-                              Iconz.fullWindow,
+                    if (!smallWindow)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: switch (audio?.audioType) {
+                          AudioType.local => LikeIcon(
+                              audio: audio,
                               color: theme.colorScheme.onSurface,
                             ),
-                            onPressed: () => appModel.setFullWindowMode(true),
-                          ),
-                        ],
+                          AudioType.radio => RadioLikeIcon(audio: audio),
+                          _ => const SizedBox.shrink(),
+                        },
                       ),
-                    )
-                  else
-                    PlayButton(active: active),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              if (!smallWindow)
+                Expanded(
+                  flex: 6,
+                  child: PlayerMainControls(active: active),
+                ),
+              if (!smallWindow)
+                Flexible(
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (audio?.audioType == AudioType.podcast)
+                        PlaybackRateButton(active: active),
+                      if (!isMobilePlatform) const VolumeSliderPopup(),
+                      const QueueButton(
+                        isSelected: false,
+                      ),
+                      IconButton(
+                        tooltip: context.l10n.fullWindow,
+                        icon: Icon(
+                          Iconz.fullWindow,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        onPressed: () => appModel.setFullWindowMode(true),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                PlayButton(active: active),
+              const SizedBox(
+                width: 10,
+              ),
+            ],
           ),
-        ],
+        ),
+      ),
+    ];
+
+    final player = SizedBox(
+      height: watchPropertyValue((PlayerModel m) => m.bottomPlayerHeight),
+      child: Column(
+        children: (isMobilePlatform ? children.reversed : children).toList(),
       ),
     );
-
-    if (isMobile) {
-      return GestureDetector(
-        onVerticalDragEnd: (details) {
-          if (details.primaryVelocity != null &&
-              details.primaryVelocity! < 150) {
-            appModel.setFullWindowMode(true);
-          }
-        },
-        child: player,
-      );
-    }
 
     if (isVideo == true) {
       return player;
@@ -152,9 +141,13 @@ class BottomPlayer extends StatelessWidget with WatchItMixin {
 
     return Stack(
       children: [
-        BlurredFullHeightPlayerImage(
-          size: Size(context.mediaQuerySize.width, bottomPlayerHeight),
-        ),
+        if (!isMobilePlatform)
+          BlurredFullHeightPlayerImage(
+            size: Size(
+              context.mediaQuerySize.width,
+              watchPropertyValue((PlayerModel m) => m.bottomPlayerHeight),
+            ),
+          ),
         player,
       ],
     );

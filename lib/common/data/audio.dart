@@ -8,7 +8,7 @@ import 'package:podcast_search/podcast_search.dart';
 import 'package:radio_browser_api/radio_browser_api.dart';
 
 import '../../extensions/string_x.dart';
-import '../../l10n/l10n.dart';
+import 'audio_type.dart';
 import 'genres.dart';
 
 class Audio {
@@ -296,6 +296,7 @@ class Audio {
       artist: data.artist,
       title: (data.title?.isNotEmpty == true ? data.title : fileName) ?? path,
       album: data.album,
+      // TODO(#339): wait for https://github.com/ClementBeal/audio_metadata_reader/issues/13
       albumArtist: data.artist,
       discNumber: data.discNumber,
       discTotal: data.totalDisc,
@@ -364,24 +365,17 @@ class Audio {
     final artistName = artist;
     final id = albumName == null && artistName == null
         ? null
-        : '${artistName ?? ''}:${albumName ?? ''}';
-    return id;
+        : _isMobilePlatform
+            ? '${artistName ?? ''}_${albumName ?? ''}'
+            : '${artistName ?? ''}:${albumName ?? ''}';
+    return _isMobilePlatform ? id?.replaceAll(' ', '_') : id;
   }
+
+  bool get _isMobilePlatform =>
+      Platform.isAndroid || Platform.isIOS || Platform.isFuchsia;
 
   bool get hasPathAndId =>
       albumId?.isNotEmpty == true &&
       path != null &&
       audioType == AudioType.local;
-}
-
-enum AudioType {
-  local,
-  radio,
-  podcast;
-
-  String localize(AppLocalizations l10n) => switch (this) {
-        local => l10n.localAudio,
-        radio => l10n.radio,
-        podcast => l10n.podcast,
-      };
 }

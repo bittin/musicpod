@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:safe_change_notifier/safe_change_notifier.dart';
 
 import '../common/data/audio.dart';
 import '../common/data/mpv_meta_data.dart';
+import '../common/view/theme.dart';
 import '../radio/online_art_service.dart';
 import 'player_service.dart';
 
@@ -24,7 +24,6 @@ class PlayerModel extends SafeChangeNotifier {
   VideoController get controller => _playerService.controller;
 
   StreamSubscription<bool>? _propertiesChangedSub;
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   Stream<String?> get onlineArtError => _onlineArtService.error;
 
@@ -84,8 +83,8 @@ class PlayerModel extends SafeChangeNotifier {
 
   Future<void> playNext() async => _playerService.playNext();
 
-  void insertIntoQueue(Audio audio) async =>
-      _playerService.insertIntoQueue(audio);
+  void insertIntoQueue(List<Audio> newAudios) async =>
+      _playerService.insertIntoQueue(newAudios);
 
   void moveAudioInQueue(int oldIndex, int newIndex) async =>
       _playerService.moveAudioInQueue(oldIndex, newIndex);
@@ -125,6 +124,9 @@ class PlayerModel extends SafeChangeNotifier {
 
   int getRadioHistoryLength({String? filter}) =>
       filteredRadioHistory(filter: filter).length;
+  MpvMetaData? getMetadata(String? icyTitle) =>
+      icyTitle == null ? null : _playerService.radioHistory[icyTitle];
+
   Iterable<MapEntry<String, MpvMetaData>> filteredRadioHistory({
     required String? filter,
   }) {
@@ -149,12 +151,21 @@ class PlayerModel extends SafeChangeNotifier {
         .replaceAll(')', '');
   }
 
-  void setTimer(Duration duration) => _playerService.setTimer(duration);
+  void setTimer(Duration duration) => _playerService.setPauseTimer(duration);
+
+  double _bottomPlayerHeight = bottomPlayerDefaultHeight;
+  double get bottomPlayerHeight => _bottomPlayerHeight;
+  set bottomPlayerHeight(double value) {
+    if (value == _bottomPlayerHeight || value < bottomPlayerDefaultHeight) {
+      return;
+    }
+    _bottomPlayerHeight = value;
+    notifyListeners();
+  }
 
   @override
   Future<void> dispose() async {
     await _propertiesChangedSub?.cancel();
-    await _connectivitySubscription?.cancel();
     super.dispose();
   }
 }

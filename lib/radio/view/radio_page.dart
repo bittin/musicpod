@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/theme.dart';
 
 import '../../app/connectivity_model.dart';
-import '../../common/data/audio.dart';
+
+import '../../common/data/audio_type.dart';
 import '../../common/view/header_bar.dart';
 import '../../common/view/offline_page.dart';
 import '../../common/view/search_button.dart';
@@ -24,7 +24,6 @@ class RadioPage extends StatelessWidget with WatchItMixin {
     if (!isOnline) return const OfflinePage();
 
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         adaptive: true,
         actions: [
@@ -34,7 +33,7 @@ class RadioPage extends StatelessWidget with WatchItMixin {
               child: SearchButton(
                 active: false,
                 onPressed: () {
-                  di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                  di<LibraryModel>().push(pageId: kSearchPageId);
                   final searchModel = di<SearchModel>();
                   if (searchModel.audioType != AudioType.radio) {
                     searchModel

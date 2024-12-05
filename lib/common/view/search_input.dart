@@ -1,6 +1,9 @@
-import '../../extensions/build_context_x.dart';
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import '../../app_config.dart';
+import '../../extensions/build_context_x.dart';
 import 'theme.dart';
 
 class SearchInput extends StatefulWidget {
@@ -12,6 +15,7 @@ class SearchInput extends StatefulWidget {
     this.onChanged,
     this.hintText,
     this.suffixIcon,
+    this.prefixIcon,
     this.autoFocus = true,
   });
   final String? text;
@@ -20,6 +24,7 @@ class SearchInput extends StatefulWidget {
   final void Function(String)? onChanged;
   final String? hintText;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
   final bool autoFocus;
 
   @override
@@ -54,7 +59,7 @@ class _SearchInputState extends State<SearchInput> {
   Widget build(BuildContext context) {
     final theme = context.theme;
     return SizedBox(
-      height: yaruStyled ? null : 38,
+      height: yaruStyled || isMobilePlatform ? null : 38,
       child: TextField(
         onTap: () {
           _controller.selection = TextSelection(
@@ -73,11 +78,13 @@ class _SearchInputState extends State<SearchInput> {
                 theme: theme,
                 hintText: widget.hintText,
                 suffixIcon: widget.suffixIcon,
+                prefixIcon: widget.prefixIcon,
               )
             : createMaterialDecoration(
                 colorScheme: theme.colorScheme,
                 hintText: widget.hintText,
                 suffixIcon: widget.suffixIcon,
+                prefixIcon: widget.prefixIcon,
               ),
       ),
     );

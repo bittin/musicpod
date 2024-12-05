@@ -6,13 +6,16 @@ import 'package:radio_browser_api/radio_browser_api.dart';
 import 'package:watch_it/watch_it.dart';
 import 'package:yaru/yaru.dart';
 
-import '../../common/data/audio.dart';
+import '../../app_config.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/adaptive_container.dart';
 import '../../common/view/audio_card.dart';
 import '../../common/view/audio_card_bottom.dart';
+import '../../common/view/icons.dart';
 import '../../common/view/no_search_result_page.dart';
 import '../../common/view/side_bar_fall_back_image.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
@@ -29,7 +32,6 @@ class RadioLibPage extends StatelessWidget with WatchItMixin {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.theme;
     final radioCollectionView =
         watchPropertyValue((RadioModel m) => m.radioCollectionView);
     final radioModel = di<RadioModel>();
@@ -44,26 +46,22 @@ class RadioLibPage extends StatelessWidget with WatchItMixin {
             margin: filterPanelPadding,
             height: context.theme.appBarTheme.toolbarHeight,
             child: YaruChoiceChipBar(
-              chipBackgroundColor: chipColor(theme),
-              selectedChipBackgroundColor: chipSelectionColor(theme, false),
-              borderColor: chipBorder(theme, false),
+              goNextIcon: Icon(Iconz.goNext),
+              goPreviousIcon: Icon(Iconz.goBack),
               selectedFirst: false,
               clearOnSelect: false,
               onSelected: (index) => radioModel
                   .setRadioCollectionView(RadioCollectionView.values[index]),
-              yaruChoiceChipBarStyle: YaruChoiceChipBarStyle.wrap,
+              style: YaruChoiceChipBarStyle.wrap,
               labels: [
                 Text(
                   context.l10n.station,
-                  style: chipTextStyle(theme),
                 ),
                 Text(
                   context.l10n.tags,
-                  style: chipTextStyle(theme),
                 ),
                 Text(
                   context.l10n.hearingHistory,
-                  style: chipTextStyle(theme),
                 ),
               ],
               isSelected: RadioCollectionView.values
@@ -102,7 +100,7 @@ class StationGrid extends StatelessWidget with WatchItMixin {
           children: [
             Text(context.l10n.noStarredStations),
             const SizedBox(
-              height: kYaruPagePadding,
+              height: kLargestSpace,
             ),
             const OpenRadioSearchButton(),
           ],
@@ -147,7 +145,7 @@ class TagGrid extends StatelessWidget with WatchItMixin {
           children: [
             Text(context.l10n.noStarredTags),
             const SizedBox(
-              height: kYaruPagePadding,
+              height: kLargestSpace,
             ),
             const OpenRadioSearchButton(),
           ],
@@ -176,7 +174,7 @@ class TagGrid extends StatelessWidget with WatchItMixin {
               ),
               bottom: AudioCardBottom(text: tag),
               onTap: () {
-                di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                di<LibraryModel>().push(pageId: kSearchPageId);
                 di<SearchModel>()
                   ..setTag(Tag(name: tag.toLowerCase(), stationCount: 1))
                   ..setAudioType(AudioType.radio)

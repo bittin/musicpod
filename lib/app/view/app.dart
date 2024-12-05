@@ -1,19 +1,11 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:phoenix_theme/phoenix_theme.dart' hide ColorX;
 import 'package:system_theme/system_theme.dart';
-import 'package:watch_it/watch_it.dart';
 import 'package:yaru/yaru.dart';
 
+import '../../app_config.dart';
 import '../../common/view/theme.dart';
-import '../../external_path/external_path_service.dart';
-import '../../l10n/l10n.dart';
-import '../../library/library_model.dart';
-import '../../settings/settings_model.dart';
-import '../connectivity_model.dart';
-import 'scaffold.dart';
-import 'splash_screen.dart';
+import 'desktop_musicpod_app.dart';
+import 'mobile_musicpod_app.dart';
 
 class YaruMusicPodApp extends StatelessWidget {
   const YaruMusicPodApp({super.key});
@@ -21,7 +13,7 @@ class YaruMusicPodApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return YaruTheme(
-      builder: (context, yaru, child) => _MusicPodApp(
+      builder: (context, yaru, child) => DesktopMusicPodApp(
         highContrastTheme: yaruHighContrastLight,
         highContrastDarkTheme: yaruHighContrastDark,
         lightTheme: yaruLightWithTweaks(yaru),
@@ -37,80 +29,9 @@ class MaterialMusicPodApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SystemThemeBuilder(
         builder: (context, accent) {
-          return _MusicPodApp(
-            accent: accent.accent,
-          );
+          return isMobilePlatform
+              ? MobileMusicPodApp(accent: accent.accent)
+              : DesktopMusicPodApp(accent: accent.accent);
         },
       );
-}
-
-class _MusicPodApp extends StatefulWidget with WatchItStatefulWidgetMixin {
-  const _MusicPodApp({
-    this.lightTheme,
-    this.darkTheme,
-    this.accent,
-    this.highContrastTheme,
-    this.highContrastDarkTheme,
-  });
-
-  final ThemeData? lightTheme,
-      darkTheme,
-      highContrastTheme,
-      highContrastDarkTheme;
-  final Color? accent;
-
-  @override
-  State<_MusicPodApp> createState() => _MusicPodAppState();
-}
-
-class _MusicPodAppState extends State<_MusicPodApp> {
-  late Future<bool> _initFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _initFuture = _init();
-  }
-
-  Future<bool> _init() async {
-    await di<ConnectivityModel>().init();
-    await di<LibraryModel>().init();
-    if (!mounted) return false;
-    di<ExternalPathService>().init();
-    return true;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final themeIndex = watchPropertyValue((SettingsModel m) => m.themeIndex);
-    final phoenix = phoenixTheme(color: widget.accent ?? Colors.greenAccent);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.values[themeIndex],
-      highContrastTheme: widget.highContrastTheme,
-      highContrastDarkTheme: widget.highContrastDarkTheme,
-      theme: widget.lightTheme ?? phoenix.lightTheme,
-      darkTheme: widget.darkTheme ?? phoenix.darkTheme,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: supportedLocales,
-      onGenerateTitle: (context) => 'MusicPod',
-      home: FutureBuilder(
-        future: _initFuture,
-        builder: (context, snapshot) {
-          return snapshot.data == true
-              ? const MusicPodScaffold()
-              : const SplashScreen();
-        },
-      ),
-      scrollBehavior: const MaterialScrollBehavior().copyWith(
-        dragDevices: {
-          PointerDeviceKind.mouse,
-          PointerDeviceKind.touch,
-          PointerDeviceKind.stylus,
-          PointerDeviceKind.unknown,
-          PointerDeviceKind.trackpad,
-        },
-      ),
-    );
-  }
 }

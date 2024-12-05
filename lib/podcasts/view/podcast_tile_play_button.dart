@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../app_config.dart';
 import '../../common/data/audio.dart';
 import '../../common/view/icons.dart';
 import '../../common/view/theme.dart';
@@ -40,12 +41,12 @@ class PodcastTilePlayButton extends StatelessWidget {
               : Duration(milliseconds: audio.durationMs!.toInt()),
         ),
         CircleAvatar(
-          radius: avatarIconRadius,
+          radius: smallAvatarButtonRadius,
           backgroundColor: selected
               ? theme.colorScheme.primary.withOpacity(0.08)
               : theme.colorScheme.onSurface.withOpacity(0.09),
           child: SizedBox.square(
-            dimension: avatarIconRadius * 2,
+            dimension: smallAvatarButtonRadius * 2,
             child: IconButton(
               icon: (isPlayerPlaying && selected)
                   ? Icon(

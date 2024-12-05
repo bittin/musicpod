@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yaru/yaru.dart';
 
-import 'theme.dart';
+import '../../app_config.dart';
 
 class Iconz {
   static IconData get image => yaruStyled
@@ -25,7 +25,7 @@ class Iconz {
             : Icons.menu_rounded;
   }
 
-  static IconData get materialSidebar => Icons.view_sidebar_rounded;
+  static IconData get materialSidebar => Icons.menu_rounded;
 
   static IconData get sidebar {
     return yaruStyled
@@ -45,10 +45,10 @@ class Iconz {
 
   static IconData get remove {
     return yaruStyled
-        ? YaruIcons.minus
+        ? YaruIcons.trash
         : appleStyled
-            ? CupertinoIcons.minus
-            : Icons.remove_rounded;
+            ? CupertinoIcons.trash
+            : Icons.delete_outline_rounded;
   }
 
   static IconData get check => yaruStyled
@@ -130,28 +130,28 @@ class Iconz {
 
   static IconData get localAudio {
     if (appleStyled) {
-      if (isMobile) {
+      if (isMobilePlatform) {
         return CupertinoIcons.device_phone_portrait;
       }
       return CupertinoIcons.device_laptop;
     }
     return yaruStyled
         ? YaruIcons.drive_harddisk
-        : isMobile
+        : isMobilePlatform
             ? Icons.phone_android_outlined
             : Icons.computer_rounded;
   }
 
   static IconData get localAudioFilled {
     if (appleStyled) {
-      if (isMobile) {
+      if (isMobilePlatform) {
         return CupertinoIcons.device_phone_portrait;
       }
       return CupertinoIcons.device_laptop;
     }
     return yaruStyled
         ? YaruIcons.drive_harddisk_filled
-        : isMobile
+        : isMobilePlatform
             ? Icons.phone_android_rounded
             : Icons.computer_rounded;
   }
@@ -186,7 +186,13 @@ class Iconz {
       ? YaruIcons.settings
       : appleStyled
           ? CupertinoIcons.settings
-          : Icons.settings_rounded;
+          : Icons.settings_outlined;
+
+  static IconData get settingsFilled => yaruStyled
+      ? YaruIcons.settings_filled
+      : appleStyled
+          ? CupertinoIcons.settings
+          : Icons.settings;
 
   static IconData get addToLibrary => yaruStyled
       ? YaruIcons.bell
@@ -352,7 +358,7 @@ class Iconz {
       ? YaruIcons.globe
       : appleStyled
           ? CupertinoIcons.globe
-          : Icons.link_rounded;
+          : Icons.language;
   static IconData get imageMissing => yaruStyled
       ? YaruIcons.image_missing
       : appleStyled
@@ -426,10 +432,10 @@ class Iconz {
           : Icons.cleaning_services_rounded;
 
   static IconData get insertIntoQueue => yaruStyled
-      ? YaruIcons.music_queue
+      ? YaruIcons.playlist_play
       : appleStyled
-          ? CupertinoIcons.plus_app
-          : Icons.queue_rounded;
+          ? CupertinoIcons.play_circle
+          : Icons.playlist_add;
   static IconData get sleep => yaruStyled
       ? YaruIcons.clear_night
       : appleStyled

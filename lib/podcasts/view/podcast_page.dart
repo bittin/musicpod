@@ -1,26 +1,29 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/yaru.dart';
 
+import '../../app_config.dart';
 import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/adaptive_container.dart';
 import '../../common/view/audio_filter.dart';
 import '../../common/view/audio_page_header.dart';
 import '../../common/view/audio_page_header_html_description.dart';
+import '../../common/view/audio_tile_option_button.dart';
 import '../../common/view/avatar_play_button.dart';
-import '../../common/view/explore_online_popup.dart';
 import '../../common/view/header_bar.dart';
 import '../../common/view/icons.dart';
 import '../../common/view/safe_network_image.dart';
 import '../../common/view/search_button.dart';
 import '../../common/view/sliver_audio_page_control_panel.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
 import '../../player/player_model.dart';
+import '../../player/view/player_pause_timer_button.dart';
 import '../../search/search_model.dart';
 import '../../search/search_type.dart';
 import '../../settings/settings_model.dart';
@@ -29,7 +32,6 @@ import 'podcast_refresh_button.dart';
 import 'podcast_reorder_button.dart';
 import 'podcast_replay_button.dart';
 import 'podcast_sub_button.dart';
-import 'podcast_timer_button.dart';
 import 'sliver_podcast_page_list.dart';
 
 class PodcastPage extends StatefulWidget with WatchItStatefulWidgetMixin {
@@ -99,7 +101,6 @@ class _PodcastPageState extends State<PodcastPage> {
         .toList();
 
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         adaptive: true,
         actions: [
@@ -107,7 +108,7 @@ class _PodcastPageState extends State<PodcastPage> {
             padding: appBarSingleActionSpacing,
             child: SearchButton(
               onPressed: () {
-                di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                di<LibraryModel>().push(pageId: kSearchPageId);
                 di<SearchModel>()
                   ..setAudioType(AudioType.podcast)
                   ..setSearchType(SearchType.podcastTitle);
@@ -164,9 +165,9 @@ class _PodcastPageState extends State<PodcastPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: space(
                       children: [
-                        if (!isMobile)
+                        if (!isMobilePlatform)
                           PodcastReplayButton(audios: episodesWithDownloads),
-                        const PodcastTimerButton(),
+                        const PlayerPauseTimerButton(),
                         PodcastSubButton(
                           audios: episodesWithDownloads,
                           pageId: widget.feedUrl,
@@ -177,15 +178,27 @@ class _PodcastPageState extends State<PodcastPage> {
                         ),
                         PodcastRefreshButton(pageId: widget.feedUrl),
                         PodcastReorderButton(feedUrl: widget.feedUrl),
-                        if (!isMobile) ExploreOnlinePopup(text: widget.title),
+                        if (!isMobilePlatform)
+                          AudioTileOptionButton(
+                            audios: episodesWithDownloads,
+                            playlistId: widget.feedUrl,
+                            allowRemove: false,
+                            selected: false,
+                            searchTerm: widget.title,
+                            title: Text(widget.title),
+                            subTitle: Text(
+                              episodesWithDownloads.firstOrNull?.artist ?? '',
+                            ),
+                          ),
                       ],
                     ),
                   ),
                 ),
                 SliverPadding(
-                  padding:
-                      getAdaptiveHorizontalPadding(constraints: constraints)
-                          .copyWith(bottom: kYaruPagePadding),
+                  padding: getAdaptiveHorizontalPadding(
+                    min: isMobilePlatform ? 0 : 15,
+                    constraints: constraints,
+                  ).copyWith(bottom: bottomPlayerPageGap ?? kLargestSpace),
                   sliver: SliverPodcastPageList(
                     audios: episodesWithDownloads,
                     pageId: widget.feedUrl,
@@ -204,7 +217,7 @@ class _PodcastPageState extends State<PodcastPage> {
     required String text,
   }) async {
     await di<PodcastModel>().init(updateMessage: context.l10n.updateAvailable);
-    di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+    di<LibraryModel>().push(pageId: kSearchPageId);
     di<SearchModel>()
       ..setAudioType(AudioType.podcast)
       ..setSearchQuery(text)
@@ -225,7 +238,7 @@ class _PodcastPageState extends State<PodcastPage> {
           e.id.toLowerCase() == text.toLowerCase() ||
           e.name.toLowerCase() == text.toLowerCase(),
     );
-    di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+    di<LibraryModel>().push(pageId: kSearchPageId);
     if (genreOrNull != null) {
       di<SearchModel>()
         ..setAudioType(AudioType.podcast)

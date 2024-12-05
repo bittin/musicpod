@@ -6,11 +6,13 @@ import '../../common/view/no_search_result_page.dart';
 import '../../common/view/round_image_container.dart';
 import '../../common/view/sliver_fill_remaining_progress.dart';
 import '../../common/view/snackbars.dart';
-import '../../constants.dart';
+import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
 import '../local_audio_model.dart';
 import 'artist_page.dart';
+import 'artist_round_image_container.dart';
 
 class ArtistsView extends StatelessWidget {
   const ArtistsView({
@@ -43,7 +45,6 @@ class ArtistsView extends StatelessWidget {
       itemBuilder: (context, index) {
         final artistName = artists!.elementAt(index);
         final artistAudios = model.findTitlesOfArtist(artistName);
-        final images = model.findLocalCovers(audios: artistAudios ?? []);
 
         final text = artists!.elementAt(index);
 
@@ -70,9 +71,83 @@ class ArtistsView extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 height: double.infinity,
-                child: RoundImageContainer(
-                  images: images,
-                  fallBackText: text,
+                child: ArtistRoundImageContainer(
+                  artistAudios: artistAudios,
+                  height: audioCardDimension,
+                  width: audioCardDimension,
+                ),
+              ),
+              ArtistVignette(text: text),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class AlbumArtistsView extends StatelessWidget {
+  const AlbumArtistsView({
+    super.key,
+    this.albumArtists,
+    this.noResultMessage,
+    this.noResultIcon,
+  });
+
+  final List<String>? albumArtists;
+  final Widget? noResultMessage, noResultIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    if (albumArtists == null) {
+      return const SliverFillRemainingProgress();
+    }
+
+    if (albumArtists!.isEmpty) {
+      return SliverFillNoSearchResultPage(
+        icon: noResultIcon,
+        message: noResultMessage,
+      );
+    }
+    final model = di<LocalAudioModel>();
+
+    return SliverGrid.builder(
+      itemCount: albumArtists!.length,
+      gridDelegate: kDiskGridDelegate,
+      itemBuilder: (context, index) {
+        final albumArtistNames = albumArtists!.elementAt(index);
+        final albumArtistsAudios =
+            model.findTitlesOfAlbumArtists(albumArtistNames);
+
+        final text = albumArtists!.elementAt(index);
+
+        return YaruSelectableContainer(
+          selected: false,
+          onTap: () {
+            final artist = albumArtistsAudios?.firstOrNull?.artist;
+            if (artist == null) {
+              showSnackBar(
+                context: context,
+                content: Text(context.l10n.unknown),
+              );
+            } else {
+              di<LibraryModel>().push(
+                builder: (_) => ArtistPage(artistAudios: albumArtistsAudios),
+                pageId: artist,
+              );
+            }
+          },
+          borderRadius: BorderRadius.circular(300),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: ArtistRoundImageContainer(
+                  artistAudios: albumArtistsAudios,
+                  height: audioCardDimension,
+                  width: audioCardDimension,
                 ),
               ),
               ArtistVignette(text: text),

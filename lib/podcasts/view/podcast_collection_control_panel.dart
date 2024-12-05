@@ -3,9 +3,8 @@ import 'package:watch_it/watch_it.dart';
 import 'package:yaru/yaru.dart';
 
 import '../../app/connectivity_model.dart';
+import '../../common/view/icons.dart';
 import '../../common/view/offline_page.dart';
-import '../../common/view/theme.dart';
-import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
 import '../podcast_model.dart';
 
@@ -14,7 +13,6 @@ class PodcastCollectionControlPanel extends StatelessWidget with WatchItMixin {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.theme;
     final model = di<PodcastModel>();
 
     final isOnline = watchPropertyValue((ConnectivityModel m) => m.isOnline);
@@ -27,20 +25,17 @@ class PodcastCollectionControlPanel extends StatelessWidget with WatchItMixin {
         watchPropertyValue((PodcastModel m) => m.downloadsOnly);
 
     return YaruChoiceChipBar(
-      chipBackgroundColor: chipColor(theme),
-      selectedChipBackgroundColor: chipSelectionColor(theme, loading),
-      borderColor: chipBorder(theme, loading),
-      yaruChoiceChipBarStyle: YaruChoiceChipBarStyle.wrap,
+      goNextIcon: Icon(Iconz.goNext),
+      goPreviousIcon: Icon(Iconz.goBack),
+      style: YaruChoiceChipBarStyle.wrap,
       clearOnSelect: false,
       selectedFirst: false,
       labels: [
         Text(
           context.l10n.newEpisodes,
-          style: chipTextStyle(theme),
         ),
         Text(
           context.l10n.downloadsOnly,
-          style: chipTextStyle(theme),
         ),
       ],
       isSelected: [

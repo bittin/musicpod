@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
+import 'ui_constants.dart';
 import '../../local_audio/view/local_cover.dart';
 import '../data/audio.dart';
+import '../data/audio_type.dart';
 import 'icons.dart';
 import 'safe_network_image.dart';
 

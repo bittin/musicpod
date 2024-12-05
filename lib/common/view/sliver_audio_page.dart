@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/yaru.dart';
 
+import '../../app_config.dart';
 import '../../constants.dart';
 import '../../library/library_model.dart';
 import '../../search/search_model.dart';
 import '../../search/search_type.dart';
 import '../data/audio.dart';
+import '../data/audio_type.dart';
 import 'adaptive_container.dart';
 import 'audio_page_header.dart';
 import 'audio_page_type.dart';
@@ -58,7 +59,6 @@ class SliverAudioPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         adaptive: true,
         actions: [
@@ -66,7 +66,7 @@ class SliverAudioPage extends StatelessWidget {
             padding: appBarSingleActionSpacing,
             child: SearchButton(
               onPressed: () {
-                di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                di<LibraryModel>().push(pageId: kSearchPageId);
                 final searchModel = di<SearchModel>();
                 if (searchModel.audioType != AudioType.local) {
                   searchModel
@@ -82,64 +82,69 @@ class SliverAudioPage extends StatelessWidget {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          return audios == null
-              ? const Center(
-                  child: Progress(),
+          final padding = getAdaptiveHorizontalPadding(
+            constraints: constraints,
+            min: isMobilePlatform ? 5 : 15,
+          );
+
+          if (audios == null) {
+            return const Center(
+              child: Progress(),
+            );
+          }
+
+          if (audios!.isEmpty) {
+            return NoSearchResultPage(
+              message: noSearchResultMessage,
+              icon: noSearchResultIcons,
+            );
+          }
+
+          return CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: padding,
+                sliver: SliverToBoxAdapter(
+                  child: AudioPageHeader(
+                    title: pageTitle ?? pageId,
+                    image: image,
+                    subTitle: pageSubTitle,
+                    label: pageLabel,
+                    onLabelTab: audioPageType == AudioPageType.likedAudio
+                        ? null
+                        : onPageLabelTab,
+                    onSubTitleTab: onPageSubTitleTab,
+                    description: description,
+                  ),
+                ),
+              ),
+              SliverAudioPageControlPanel(
+                controlPanel: controlPanel ??
+                    AvatarPlayButton(
+                      audios: audios ?? [],
+                      pageId: pageId,
+                    ),
+              ),
+              if (audios == null)
+                const SliverToBoxAdapter(
+                  child: Center(
+                    child: Progress(),
+                  ),
                 )
-              : audios!.isEmpty
-                  ? NoSearchResultPage(
-                      message: noSearchResultMessage,
-                      icon: noSearchResultIcons,
-                    )
-                  : CustomScrollView(
-                      slivers: [
-                        SliverPadding(
-                          padding: getAdaptiveHorizontalPadding(
-                            constraints: constraints,
-                            min: 40,
-                          ),
-                          sliver: SliverToBoxAdapter(
-                            child: AudioPageHeader(
-                              title: pageTitle ?? pageId,
-                              image: image,
-                              subTitle: pageSubTitle,
-                              label: pageLabel,
-                              onLabelTab:
-                                  audioPageType == AudioPageType.likedAudio
-                                      ? null
-                                      : onPageLabelTab,
-                              onSubTitleTab: onPageSubTitleTab,
-                              description: description,
-                            ),
-                          ),
-                        ),
-                        SliverAudioPageControlPanel(
-                          controlPanel: controlPanel ??
-                              AvatarPlayButton(
-                                audios: audios ?? [],
-                                pageId: pageId,
-                              ),
-                        ),
-                        if (audios == null)
-                          const SliverToBoxAdapter(
-                            child: Center(
-                              child: Progress(),
-                            ),
-                          )
-                        else
-                          SliverPadding(
-                            padding: getAdaptiveHorizontalPadding(
-                              constraints: constraints,
-                            ),
-                            sliver: SliverAudioTileList(
-                              audioPageType: audioPageType,
-                              audios: audios!,
-                              pageId: pageId,
-                              onSubTitleTab: onPageLabelTab,
-                            ),
-                          ),
-                      ],
-                    );
+              else
+                SliverPadding(
+                  padding: padding.copyWith(
+                    bottom: bottomPlayerPageGap,
+                  ),
+                  sliver: SliverAudioTileList(
+                    audioPageType: audioPageType,
+                    audios: audios!,
+                    pageId: pageId,
+                    onSubTitleTab: onPageLabelTab,
+                  ),
+                ),
+            ],
+          );
         },
       ),
     );

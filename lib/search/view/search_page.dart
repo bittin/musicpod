@@ -1,15 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/theme.dart';
 
-import '../../common/data/audio.dart';
+import '../../app_config.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/adaptive_container.dart';
 import '../../common/view/header_bar.dart';
 import '../../common/view/progress.dart';
 import '../../common/view/search_button.dart';
 import '../../common/view/sliver_filter_app_bar.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../library/library_model.dart';
 import '../search_model.dart';
 import 'search_page_input.dart';
@@ -28,16 +31,17 @@ class SearchPage extends StatelessWidget with WatchItMixin {
     final loading = watchPropertyValue((SearchModel m) => m.loading);
 
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         adaptive: true,
         title: Padding(
-          padding: EdgeInsets.only(left: isMobile ? 5 : 0),
+          padding: EdgeInsets.only(left: isMobilePlatform ? 5 : 0),
           child: const SearchPageInput(),
         ),
         actions: [
           Padding(
-            padding: appBarSingleActionSpacing,
+            padding: appBarSingleActionSpacing.copyWith(
+              left: Platform.isMacOS ? 5 : kLargestSpace,
+            ),
             child: SearchButton(
               active: true,
               onPressed: () => di<LibraryModel>().pop(),
@@ -57,10 +61,9 @@ class SearchPage extends StatelessWidget with WatchItMixin {
         builder: (context, constraints) {
           return NotificationListener<UserScrollNotification>(
             onNotification: (notification) {
-              // TODO(#926): improve radio search limit increase by not overwriting the search results
-              // disabled for radio until then
-              if (notification.direction == ScrollDirection.reverse &&
-                  audioType == AudioType.podcast) {
+              if (notification.metrics.axisDirection == AxisDirection.down &&
+                  notification.direction == ScrollDirection.reverse &&
+                  audioType != AudioType.local) {
                 di<SearchModel>()
                   ..incrementLimit(8)
                   ..search();
@@ -74,9 +77,7 @@ class SearchPage extends StatelessWidget with WatchItMixin {
                       getAdaptiveHorizontalPadding(constraints: constraints)
                           .copyWith(
                     bottom: filterPanelPadding.bottom,
-                    left: filterPanelPadding.left,
                     top: filterPanelPadding.top,
-                    right: filterPanelPadding.right,
                   ),
                   onStretchTrigger: () async {
                     WidgetsBinding.instance
@@ -93,7 +94,10 @@ class SearchPage extends StatelessWidget with WatchItMixin {
                 ),
                 SliverPadding(
                   padding:
-                      getAdaptiveHorizontalPadding(constraints: constraints),
+                      getAdaptiveHorizontalPadding(constraints: constraints)
+                          .copyWith(
+                    bottom: bottomPlayerPageGap,
+                  ),
                   sliver: switch (audioType) {
                     AudioType.radio => const SliverRadioSearchResults(),
                     AudioType.podcast => const SliverPodcastSearchResults(),

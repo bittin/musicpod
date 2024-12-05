@@ -1,26 +1,25 @@
 import 'package:animated_emoji/animated_emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/yaru.dart';
 
-import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/adaptive_container.dart';
-import '../../common/view/common_widgets.dart';
 import '../../common/view/header_bar.dart';
 import '../../common/view/search_button.dart';
 import '../../common/view/sliver_filter_app_bar.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../constants.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
 import '../../search/search_model.dart';
 import '../../search/search_type.dart';
-import '../../settings/view/settings_dialog.dart';
+import '../../settings/view/settings_action.dart';
 import '../local_audio_model.dart';
+import '../local_audio_view.dart';
 import 'failed_imports_content.dart';
 import 'local_audio_body.dart';
 import 'local_audio_control_panel.dart';
-import 'local_audio_view.dart';
 
 class LocalAudioPage extends StatefulWidget with WatchItStatefulWidgetMixin {
   const LocalAudioPage({super.key});
@@ -48,6 +47,9 @@ class _LocalAudioPageState extends State<LocalAudioPage> {
   Widget build(BuildContext context) {
     final audios = watchPropertyValue((LocalAudioModel m) => m.audios);
     final allArtists = watchPropertyValue((LocalAudioModel m) => m.allArtists);
+    final allAlbumArtists =
+        watchPropertyValue((LocalAudioModel m) => m.allAlbumArtists);
+
     final allAlbums = watchPropertyValue((LocalAudioModel m) => m.allAlbums);
     final allGenres = watchPropertyValue((LocalAudioModel m) => m.allGenres);
     final playlists =
@@ -56,7 +58,6 @@ class _LocalAudioPageState extends State<LocalAudioPage> {
     final localAudioView = LocalAudioView.values[index];
 
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         adaptive: true,
         titleSpacing: 0,
@@ -66,7 +67,7 @@ class _LocalAudioPageState extends State<LocalAudioPage> {
             child: SearchButton(
               active: false,
               onPressed: () {
-                di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                di<LibraryModel>().push(pageId: kSearchPageId);
                 final searchmodel = di<SearchModel>();
                 searchmodel
                   ..setAudioType(AudioType.local)
@@ -86,19 +87,21 @@ class _LocalAudioPageState extends State<LocalAudioPage> {
                 padding: getAdaptiveHorizontalPadding(constraints: constraints)
                     .copyWith(
                   bottom: filterPanelPadding.bottom,
-                  left: filterPanelPadding.left,
                   top: filterPanelPadding.top,
-                  right: filterPanelPadding.right,
                 ),
                 title: const LocalAudioControlPanel(),
               ),
               SliverPadding(
-                padding: getAdaptiveHorizontalPadding(constraints: constraints),
+                padding: getAdaptiveHorizontalPadding(constraints: constraints)
+                    .copyWith(
+                  bottom: bottomPlayerPageGap,
+                ),
                 sliver: LocalAudioBody(
                   localAudioView: localAudioView,
                   titles: audios,
                   albums: allAlbums,
                   artists: allArtists,
+                  albumArtists: allAlbumArtists,
                   genres: allGenres,
                   playlists: playlists,
                   noResultIcon: const AnimatedEmoji(AnimatedEmojis.bird),
@@ -107,17 +110,9 @@ class _LocalAudioPageState extends State<LocalAudioPage> {
                     children: [
                       Text(context.l10n.noLocalTitlesFound),
                       const SizedBox(
-                        height: kYaruPagePadding,
+                        height: kLargestSpace,
                       ),
-                      ImportantButton(
-                        child: Text(context.l10n.settings),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (_) => const SettingsDialog(),
-                          );
-                        },
-                      ),
+                      const SettingsButton.important(),
                     ],
                   ),
                 ),

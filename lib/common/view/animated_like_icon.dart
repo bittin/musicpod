@@ -1,3 +1,4 @@
+import '../../app_config.dart';
 import 'icons.dart';
 import 'package:flutter/material.dart';
 import 'package:yaru/yaru.dart';
@@ -27,12 +28,12 @@ class AnimatedStar extends StatelessWidget {
           ? Icon(
               Iconz.starFilled,
               size: iconSize,
-              color: isStarred ? color : null,
+              color: color,
             )
           : Icon(
               Iconz.star,
               size: iconSize,
-              color: isStarred ? color : null,
+              color: color,
             );
     }
   }

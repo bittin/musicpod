@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../app/connectivity_model.dart';
-import '../../common/data/audio.dart';
+import '../../app_config.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/icons.dart';
 import '../../common/view/theme.dart';
 import '../../extensions/build_context_x.dart';
 import '../../extensions/theme_data_x.dart';
 import '../../l10n/l10n.dart';
-import '../../radio/view/next_station_button.dart';
 import '../player_model.dart';
 import 'play_button.dart';
+import 'player_pause_timer_button.dart';
 import 'repeat_button.dart';
 import 'seek_button.dart';
 import 'shuffle_button.dart';
@@ -21,10 +22,16 @@ class PlayerMainControls extends StatelessWidget with WatchItMixin {
     required this.active,
     this.iconColor,
     this.avatarColor,
+    this.mainAxisAlignment = MainAxisAlignment.center,
+    this.mainAxisSize = MainAxisSize.max,
+    this.avatarPlayButton = true,
   });
 
   final bool active;
   final Color? iconColor, avatarColor;
+  final MainAxisAlignment mainAxisAlignment;
+  final MainAxisSize mainAxisSize;
+  final bool avatarPlayButton;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +43,25 @@ class PlayerMainControls extends StatelessWidget with WatchItMixin {
         queueLength > 1 || audio?.audioType == AudioType.local;
     final isOnline = watchPropertyValue((ConnectivityModel m) => m.isOnline);
     final active = audio?.path != null || isOnline;
+
+    final rawPlayButton = PlayButton(
+      iconColor: iconColor ?? (theme.isLight ? Colors.white : Colors.black),
+      active: active,
+    );
+
+    final radius =
+        isMobilePlatform ? bigAvatarButtonRadius : smallAvatarButtonRadius;
+    final playButton = avatarPlayButton
+        ? CircleAvatar(
+            radius: radius,
+            backgroundColor:
+                avatarColor ?? (theme.isLight ? Colors.black : Colors.white),
+            child: SizedBox.square(
+              dimension: 2 * radius,
+              child: rawPlayButton,
+            ),
+          )
+        : rawPlayButton;
 
     final children = <Widget>[
       switch (audio?.audioType) {
@@ -51,7 +77,7 @@ class PlayerMainControls extends StatelessWidget with WatchItMixin {
         AudioType.radio => IconButton(
             tooltip: context.l10n.skipToLivStream,
             onPressed: di<PlayerModel>().playNext,
-            icon: Icon(Iconz.refresh),
+            icon: Icon(Iconz.refresh, color: defaultColor),
           ),
         _ => const SizedBox.shrink()
       },
@@ -67,15 +93,7 @@ class PlayerMainControls extends StatelessWidget with WatchItMixin {
           ),
         ),
       _flex,
-      CircleAvatar(
-        radius: avatarIconRadius,
-        backgroundColor:
-            avatarColor ?? (theme.isLight ? Colors.black : Colors.white),
-        child: PlayButton(
-          iconColor: iconColor ?? (theme.isLight ? Colors.white : Colors.black),
-          active: active,
-        ),
-      ),
+      playButton,
       _flex,
       if (showSkipButtons)
         IconButton(
@@ -99,13 +117,14 @@ class PlayerMainControls extends StatelessWidget with WatchItMixin {
             active: active,
             iconColor: defaultColor,
           ),
-        AudioType.radio => const NextStationButton(),
+        AudioType.radio => const PlayerPauseTimerButton(),
         _ => const SizedBox.shrink(),
       },
     ];
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: mainAxisSize,
+      mainAxisAlignment: mainAxisAlignment,
       children: children,
     );
   }

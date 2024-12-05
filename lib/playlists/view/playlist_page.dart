@@ -5,9 +5,9 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/theme.dart';
 
 import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/adaptive_container.dart';
 import '../../common/view/audio_page_header.dart';
 import '../../common/view/audio_page_type.dart';
@@ -21,6 +21,7 @@ import '../../common/view/sliver_audio_page_control_panel.dart';
 import '../../common/view/sliver_audio_tile_list.dart';
 import '../../common/view/tapable_text.dart';
 import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../extensions/media_file_x.dart';
@@ -72,7 +73,7 @@ class PlaylistPage extends StatelessWidget with WatchItMixin {
               if (value == null) return;
               final file = File.fromUri(value);
               if (file.isValidMedia) {
-                final data = await readMetadata(file, getImage: true);
+                final data = readMetadata(file, getImage: true);
                 var audio = Audio.fromMetadata(path: file.path, data: data);
                 playlist?.add(audio);
               }
@@ -89,7 +90,6 @@ class PlaylistPage extends StatelessWidget with WatchItMixin {
         }
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: isMobile ? false : null,
         appBar: HeaderBar(
           adaptive: true,
           actions: [
@@ -97,7 +97,7 @@ class PlaylistPage extends StatelessWidget with WatchItMixin {
               padding: appBarSingleActionSpacing,
               child: SearchButton(
                 onPressed: () {
-                  di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+                  di<LibraryModel>().push(pageId: kSearchPageId);
                   final searchmodel = di<SearchModel>();
                   searchmodel
                     ..setAudioType(AudioType.local)
@@ -268,6 +268,8 @@ class _PlaylistPageBody extends StatelessWidget with WatchItMixin {
                 padding: getAdaptiveHorizontalPadding(
                   constraints: constraints,
                   min: 40,
+                ).copyWith(
+                  bottom: bottomPlayerPageGap,
                 ),
                 sliver: SliverReorderableList(
                   itemCount: audios.length,
@@ -290,7 +292,6 @@ class _PlaylistPageBody extends StatelessWidget with WatchItMixin {
                         ),
                         selected: audioSelected,
                         audio: audio,
-                        insertIntoQueue: playerModel.insertIntoQueue,
                         pageId: pageId,
                         audioPageType: AudioPageType.playlist,
                       ),
@@ -353,12 +354,11 @@ class _PlaylistControlPanel extends StatelessWidget with WatchItMixin {
                 content: SizedBox(
                   height: 200,
                   width: 500,
-                  child: PlaylistContent(
+                  child: PlaylistEditDialogContent(
                     playlistName: pageId,
                     initialValue: pageId,
                     allowDelete: true,
                     allowRename: true,
-                    libraryModel: libraryModel,
                   ),
                 ),
               ),

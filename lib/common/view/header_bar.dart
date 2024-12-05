@@ -5,6 +5,7 @@ import 'package:watch_it/watch_it.dart';
 import 'package:yaru/yaru.dart';
 
 import '../../app/app_model.dart';
+import '../../app_config.dart';
 import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
@@ -43,19 +44,21 @@ class HeaderBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
+    final useSidebarButton = isMobilePlatform ? false : includeSidebarButton;
+    final useBackButton = isMobilePlatform ? true : includeBackButton;
     final canPop = watchPropertyValue((LibraryModel m) => m.canPop);
 
     Widget? leading;
 
-    if (includeSidebarButton &&
+    if (useSidebarButton &&
         !context.showMasterPanel &&
         masterScaffoldKey.currentState?.isDrawerOpen == false) {
       leading = const SidebarButton();
     } else {
-      if (includeBackButton && canPop) {
+      if (useBackButton && canPop) {
         leading = const NavBackButton();
       } else {
-        leading = isMobile
+        leading = isMobilePlatform
             ? const SizedBox(
                 width: 60,
               )
@@ -63,8 +66,14 @@ class HeaderBar extends StatelessWidget
       }
     }
 
-    if (isMobile) {
+    if (isMobilePlatform) {
+      final fullWindowMode =
+          watchPropertyValue((AppModel m) => m.fullWindowMode) == true;
       return AppBar(
+        systemOverlayStyle: systemOverlayStyle(
+          theme: context.theme,
+          fullWindowMode: fullWindowMode,
+        ),
         backgroundColor: backgroundColor,
         titleSpacing: titleSpacing,
         centerTitle: true,
@@ -112,7 +121,7 @@ class HeaderBar extends StatelessWidget
   @override
   Size get preferredSize => Size(
         0,
-        isMobile
+        isMobilePlatform
             ? (style == YaruTitleBarStyle.hidden ? 0 : kYaruTitleBarHeight)
             : kToolbarHeight,
       );

@@ -1,5 +1,102 @@
 # Changelog
 
+## [2.5.0](https://github.com/ubuntu-flutter-community/musicpod/compare/v2.4.0...v2.5.0) (2024-11-28)
+
+
+### Features
+
+* add elapsed in bottom player time if activated in the settings ([#1025](https://github.com/ubuntu-flutter-community/musicpod/issues/1025)) ([5a6a38c](https://github.com/ubuntu-flutter-community/musicpod/commit/5a6a38ca7bd2f3cad5dfbda0a91fdc62082b453b)), closes [#753](https://github.com/ubuntu-flutter-community/musicpod/issues/753)
+* add listenbrainz scrobbling support ([#1047](https://github.com/ubuntu-flutter-community/musicpod/issues/1047)) ([6ff4723](https://github.com/ubuntu-flutter-community/musicpod/commit/6ff4723e924293c46b8871ec878783fe53425bc9))
+* add radio sleep timer ([#1054](https://github.com/ubuntu-flutter-community/musicpod/issues/1054)) ([c4b56b8](https://github.com/ubuntu-flutter-community/musicpod/commit/c4b56b805115c08df5d51a8ae11aacd2f0571c85))
+* add support for "Album Artist" ([#1024](https://github.com/ubuntu-flutter-community/musicpod/issues/1024)) ([284fd66](https://github.com/ubuntu-flutter-community/musicpod/commit/284fd66ffd5be1ac673f76f70a57e556ff4258da)), closes [#339](https://github.com/ubuntu-flutter-community/musicpod/issues/339)
+* also use the cover image stored inside the album folders ([#1049](https://github.com/ubuntu-flutter-community/musicpod/issues/1049)) ([dd6512c](https://github.com/ubuntu-flutter-community/musicpod/commit/dd6512c9877e461fd0665e47c67d413650882536)), closes [#1048](https://github.com/ubuntu-flutter-community/musicpod/issues/1048)
+* fix android permissions and icon ([#1027](https://github.com/ubuntu-flutter-community/musicpod/issues/1027)) ([0708612](https://github.com/ubuntu-flutter-community/musicpod/commit/07086123c10b49fd0ea1b49b5a47b1bbd8ba6818))
+* improve mobile tiles and page option buttons with bottom sheets ([#1041](https://github.com/ubuntu-flutter-community/musicpod/issues/1041)) ([e9ab5de](https://github.com/ubuntu-flutter-community/musicpod/commit/e9ab5decb581e7e112473f392997f02453d2d271))
+* italian language update ([#1030](https://github.com/ubuntu-flutter-community/musicpod/issues/1030)) ([008ce6d](https://github.com/ubuntu-flutter-community/musicpod/commit/008ce6d6f877ca0f8be2b743c353018308ea8c38))
+* make use of pinned albums in the mobile view, persist local audio index (again) ([#1044](https://github.com/ubuntu-flutter-community/musicpod/issues/1044)) ([195f57f](https://github.com/ubuntu-flutter-community/musicpod/commit/195f57f381ef304fdacb17f548bf3697ea13714d))
+* more android UI fixes ([#1028](https://github.com/ubuntu-flutter-community/musicpod/issues/1028)) ([515eb57](https://github.com/ubuntu-flutter-community/musicpod/commit/515eb57e6d427ad304b216610c2fd6f25aa06432))
+* new mobile scaffold ([#1034](https://github.com/ubuntu-flutter-community/musicpod/issues/1034)) ([d19308e](https://github.com/ubuntu-flutter-community/musicpod/commit/d19308e09332018eb91a67a79f77c77be8b65b4c))
+* show option bottom sheets for audio tiles on mobile ([#1032](https://github.com/ubuntu-flutter-community/musicpod/issues/1032)) ([bb7eef5](https://github.com/ubuntu-flutter-community/musicpod/commit/bb7eef57213fd38bb050c7656dd97ebee377ae90))
+* translations update from Hosted Weblate ([#1039](https://github.com/ubuntu-flutter-community/musicpod/issues/1039)) ([aab9ddd](https://github.com/ubuntu-flutter-community/musicpod/commit/aab9ddd5799629c7b390cf2ae451484f99f294bf))
+* Translations update from Hosted Weblate ([#1052](https://github.com/ubuntu-flutter-community/musicpod/issues/1052)) ([b4adf00](https://github.com/ubuntu-flutter-community/musicpod/commit/b4adf0094abed8499fd903676352c58d06bd2cb0))
+* Translations update from Hosted Weblate ([#1056](https://github.com/ubuntu-flutter-community/musicpod/issues/1056)) ([472d04b](https://github.com/ubuntu-flutter-community/musicpod/commit/472d04b724d2a2fbd20cbad7134b52b4be0d26f5))
+* update app_sk.arb ([#1033](https://github.com/ubuntu-flutter-community/musicpod/issues/1033)) ([dbc89f5](https://github.com/ubuntu-flutter-community/musicpod/commit/dbc89f5aa0f3e55717656e80506662ff46c4f701))
+* update app_sv.arb ([#1031](https://github.com/ubuntu-flutter-community/musicpod/issues/1031)) ([b94fdca](https://github.com/ubuntu-flutter-community/musicpod/commit/b94fdca0d68e610086b349db74eaba6e32997afb))
+* use bottom sheets for search input prefix and suffix, move AudioType to its own file ([#1042](https://github.com/ubuntu-flutter-community/musicpod/issues/1042)) ([b050101](https://github.com/ubuntu-flutter-community/musicpod/commit/b050101086a654aaa8168e065547f82da49767c9))
+* use settings as a dedicated page for mobile ([#1057](https://github.com/ubuntu-flutter-community/musicpod/issues/1057)) ([a788794](https://github.com/ubuntu-flutter-community/musicpod/commit/a788794c2ca7877cc2152accee6b9dcf4bfccbff))
+
+
+### Bug Fixes
+
+* android notification media controls and improve player style ([#1058](https://github.com/ubuntu-flutter-community/musicpod/issues/1058)) ([af273cc](https://github.com/ubuntu-flutter-community/musicpod/commit/af273cc063f0229ad3af12c6b64226218a23a49d))
+* audio service ([#1059](https://github.com/ubuntu-flutter-community/musicpod/issues/1059)) ([25883c7](https://github.com/ubuntu-flutter-community/musicpod/commit/25883c76694c814f6a658add5b73fc57c0a13b64))
+* band-aid fix to disallow linux video fullscreen ([#1023](https://github.com/ubuntu-flutter-community/musicpod/issues/1023)) ([8dbaa98](https://github.com/ubuntu-flutter-community/musicpod/commit/8dbaa98db2a345ee8a620b76a6af2544723d5cbf)), closes [#1022](https://github.com/ubuntu-flutter-community/musicpod/issues/1022)
+* delete redundant chinese CN file to prepare for weblate ([#1038](https://github.com/ubuntu-flutter-community/musicpod/issues/1038)) ([6c722d8](https://github.com/ubuntu-flutter-community/musicpod/commit/6c722d8ef1e34f42c572cf224178ea2639cb2a35))
+* disable album artist filter until provided by audio_metadata_reader ([#1068](https://github.com/ubuntu-flutter-community/musicpod/issues/1068)) ([1fa6bae](https://github.com/ubuntu-flutter-community/musicpod/commit/1fa6bae67482df9c91535d61c359d202489c5ad2)), closes [#339](https://github.com/ubuntu-flutter-community/musicpod/issues/339)
+* mobile search input padding, pin albums in view ([#1043](https://github.com/ubuntu-flutter-community/musicpod/issues/1043)) ([699eb9b](https://github.com/ubuntu-flutter-community/musicpod/commit/699eb9b2eecbff8a452e8972dc4e12c39cfb301e))
+* pt arb file name ([#1037](https://github.com/ubuntu-flutter-community/musicpod/issues/1037)) ([434f662](https://github.com/ubuntu-flutter-community/musicpod/commit/434f662755133f03eccf591035b363ba110cd113))
+* remove unnecessary popping of pages + minor refactoring ([#1067](https://github.com/ubuntu-flutter-community/musicpod/issues/1067)) ([45f647b](https://github.com/ubuntu-flutter-community/musicpod/commit/45f647b3c17bdb25c5e75311cb27b7a2bb99c1e5))
+* remove volume slider for mobile ([#1064](https://github.com/ubuntu-flutter-community/musicpod/issues/1064)) ([5d80fa8](https://github.com/ubuntu-flutter-community/musicpod/commit/5d80fa85ad6e2819c8cf2c2ffea614e53c5f736a))
+* repeat single should not disable traversing with next/prev buttons ([#1061](https://github.com/ubuntu-flutter-community/musicpod/issues/1061)) ([4abc7b9](https://github.com/ubuntu-flutter-community/musicpod/commit/4abc7b942b30560036dc1a57391e6fc87cc677c2)), closes [#1060](https://github.com/ubuntu-flutter-community/musicpod/issues/1060)
+* windows new smtc plugin ([#1020](https://github.com/ubuntu-flutter-community/musicpod/issues/1020)) ([6d78c2b](https://github.com/ubuntu-flutter-community/musicpod/commit/6d78c2be575024404bd095dee5579987373ca19d))
+* wrong radius for play button on desktop ([#1053](https://github.com/ubuntu-flutter-community/musicpod/issues/1053)) ([efb9bb4](https://github.com/ubuntu-flutter-community/musicpod/commit/efb9bb4632a41985cb5c0035ed6ebdd3f598471b))
+
+## [2.4.0](https://github.com/ubuntu-flutter-community/musicpod/compare/v2.3.0...v2.4.0) (2024-11-16)
+
+
+### Features
+
+* add last.fm integration ([#1000](https://github.com/ubuntu-flutter-community/musicpod/issues/1000)) ([0145295](https://github.com/ubuntu-flutter-community/musicpod/commit/01452957253c30f8c77ba62b221ff1752bd03295))
+* improve local audio import speed by updating audio_metadata_reader ([#1019](https://github.com/ubuntu-flutter-community/musicpod/issues/1019)) ([ba9c0c6](https://github.com/ubuntu-flutter-community/musicpod/commit/ba9c0c69bb7949fc388fe17b31d515c69c203b98))
+* Italian language update ([#1013](https://github.com/ubuntu-flutter-community/musicpod/issues/1013)) ([ecc360e](https://github.com/ubuntu-flutter-community/musicpod/commit/ecc360ee1b9b0278a84fbf7a7b456d60fa60a171))
+* update theme packages and remove chip theme modifications ([#1014](https://github.com/ubuntu-flutter-community/musicpod/issues/1014)) ([31bee47](https://github.com/ubuntu-flutter-community/musicpod/commit/31bee4724d253220f761688c0a7b18187ebb31e9))
+
+
+### Bug Fixes
+
+* get notified about cover store changes  ([#1011](https://github.com/ubuntu-flutter-community/musicpod/issues/1011)) ([316adf5](https://github.com/ubuntu-flutter-community/musicpod/commit/316adf50dc3a2bbfcc1c21b2abdedff2f25189e4))
+* last fm improve settings UI ([#1012](https://github.com/ubuntu-flutter-community/musicpod/issues/1012)) ([5b35fe3](https://github.com/ubuntu-flutter-community/musicpod/commit/5b35fe382d335013340690ffd64d8d4d11329d19))
+* local cover and chip sizes ([#1015](https://github.com/ubuntu-flutter-community/musicpod/issues/1015)) ([8f6ccc2](https://github.com/ubuntu-flutter-community/musicpod/commit/8f6ccc22e8f8b12f4634c49ff6f7398a33870297))
+* monochrome controls for fullscreen radio TV video streams ([#1009](https://github.com/ubuntu-flutter-community/musicpod/issues/1009)) ([9effd9c](https://github.com/ubuntu-flutter-community/musicpod/commit/9effd9ceaab0ffff1357ab641570b34d0eb551e9))
+* move last fm to its own service, re-organize main by adding register.dart ([#1017](https://github.com/ubuntu-flutter-community/musicpod/issues/1017)) ([eab977e](https://github.com/ubuntu-flutter-community/musicpod/commit/eab977e4c26116964b4273cfe4abff1788c6bac2))
+* unstarred light theme icon, settingsservice ([#1018](https://github.com/ubuntu-flutter-community/musicpod/issues/1018)) ([1bad15e](https://github.com/ubuntu-flutter-community/musicpod/commit/1bad15ef41e57ae868290f7d716882ace1254e11))
+
+## [2.3.0](https://github.com/ubuntu-flutter-community/musicpod/compare/v2.2.0...v2.3.0) (2024-11-09)
+
+
+### Features
+
+* redesign the podcast search filtering ([#993](https://github.com/ubuntu-flutter-community/musicpod/issues/993)) ([10ecac9](https://github.com/ubuntu-flutter-community/musicpod/commit/10ecac9747c557a503243f425454742f657fd1e3))
+* update Italian language ([#987](https://github.com/ubuntu-flutter-community/musicpod/issues/987)) ([b9cb02d](https://github.com/ubuntu-flutter-community/musicpod/commit/b9cb02dc2fbc98f4749c015245746cf22e4d30e2))
+* update spanish translations ([#995](https://github.com/ubuntu-flutter-community/musicpod/issues/995)) ([ce9cf1b](https://github.com/ubuntu-flutter-community/musicpod/commit/ce9cf1b93e0efba86d4d58cf0f7eb1448f740285))
+
+
+### Bug Fixes
+
+* changelog links are unclickable ([#994](https://github.com/ubuntu-flutter-community/musicpod/issues/994)) ([ee60398](https://github.com/ubuntu-flutter-community/musicpod/commit/ee603986daf3233f2f9dca77e977d60d371e3c75)), closes [#992](https://github.com/ubuntu-flutter-community/musicpod/issues/992)
+* podcast and radio search jumping on scroll ([#991](https://github.com/ubuntu-flutter-community/musicpod/issues/991)) ([7059972](https://github.com/ubuntu-flutter-community/musicpod/commit/70599727d7f8d4f0fe0f10dc526392ed50d9dbb0)), closes [#926](https://github.com/ubuntu-flutter-community/musicpod/issues/926)
+* radio history tile images after new station uuid mapping ([#998](https://github.com/ubuntu-flutter-community/musicpod/issues/998)) ([e305900](https://github.com/ubuntu-flutter-community/musicpod/commit/e3059000cf109a8f30ed1afc0bf7775a3d4189bf))
+* radiosearch empty on initial search swap from podcasts, add back radio search -&gt; StationPage routing ([#989](https://github.com/ubuntu-flutter-community/musicpod/issues/989)) ([27ab963](https://github.com/ubuntu-flutter-community/musicpod/commit/27ab9633f6ce2f975c023438d9cc30c6981d8ba6))
+* yaru chips ([#996](https://github.com/ubuntu-flutter-community/musicpod/issues/996)) ([c8b6f95](https://github.com/ubuntu-flutter-community/musicpod/commit/c8b6f95d8b10152cc31251cd3e6b976e356d80f2))
+
+## [2.2.0](https://github.com/ubuntu-flutter-community/musicpod/compare/v2.1.0...v2.2.0) (2024-10-27)
+
+
+### Features
+
+* add playlists to localaudio view and search ([#980](https://github.com/ubuntu-flutter-community/musicpod/issues/980)) ([5293dca](https://github.com/ubuntu-flutter-community/musicpod/commit/5293dcaba689238c15e0c03e9a57c460bb4385f5))
+* bring back the audio type playing indicator by @HrX03 ([#982](https://github.com/ubuntu-flutter-community/musicpod/issues/982)) ([c29c80d](https://github.com/ubuntu-flutter-community/musicpod/commit/c29c80d487c42c5459b9d78564db1cb502b90e1f))
+* update i10n for zh ([#973](https://github.com/ubuntu-flutter-community/musicpod/issues/973)) ([78bd83b](https://github.com/ubuntu-flutter-community/musicpod/commit/78bd83bad5e9b26db95396b394c9c7d7afeb1433))
+* update Italian language ([#974](https://github.com/ubuntu-flutter-community/musicpod/issues/974)) ([57c8c59](https://github.com/ubuntu-flutter-community/musicpod/commit/57c8c5954d44d9579e781744aa3de9ee50f49d8d))
+* update Swedish translation ([#985](https://github.com/ubuntu-flutter-community/musicpod/issues/985)) ([caf95f4](https://github.com/ubuntu-flutter-community/musicpod/commit/caf95f40d77ae279b323d3608e9d526ca33fa6cc))
+
+
+### Bug Fixes
+
+* add favs to playlistsview + friends ([#981](https://github.com/ubuntu-flutter-community/musicpod/issues/981)) ([89ed1ff](https://github.com/ubuntu-flutter-community/musicpod/commit/89ed1ff5b55a69b67ec63407d09153a854a6f6e6))
+* add track info in video play overlay ([#983](https://github.com/ubuntu-flutter-community/musicpod/issues/983)) ([ace16e8](https://github.com/ubuntu-flutter-community/musicpod/commit/ace16e8b500f4b9d34c7f67fbc33d4915312750f))
+* internet archive errors after their ddos attack recovery ([#979](https://github.com/ubuntu-flutter-community/musicpod/issues/979)) ([13fefb6](https://github.com/ubuntu-flutter-community/musicpod/commit/13fefb6ecd8926a58732fa0c0e5c59eb1182ccd2))
+
 ## [2.1.0](https://github.com/ubuntu-flutter-community/musicpod/compare/v2.0.2...v2.1.0) (2024-10-21)
 
 

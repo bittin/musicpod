@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:radio_browser_api/radio_browser_api.dart' hide State;
 import 'package:watch_it/watch_it.dart';
-import 'package:yaru/theme.dart';
 
-import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/adaptive_container.dart';
 import '../../common/view/header_bar.dart';
 import '../../common/view/icons.dart';
+import '../../common/view/theme.dart';
 import '../../constants.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
-import '../../radio/radio_model.dart';
 import '../../search/search_model.dart';
 import '../../search/search_type.dart';
 import '../local_audio_model.dart';
@@ -46,10 +45,7 @@ class _GenrePageState extends State<GenrePage> {
 
   @override
   Widget build(BuildContext context) {
-    final radioModel = di<RadioModel>();
-
     return Scaffold(
-      resizeToAvoidBottomInset: isMobile ? false : null,
       appBar: HeaderBar(
         adaptive: true,
         titleSpacing: 0,
@@ -58,8 +54,8 @@ class _GenrePageState extends State<GenrePage> {
           children: [
             IconButton(
               tooltip: context.l10n.searchForRadioStationsWithGenreName,
-              onPressed: () => radioModel.init().then((value) {
-                di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+              onPressed: () {
+                di<LibraryModel>().push(pageId: kSearchPageId);
                 di<SearchModel>()
                   ..setTag(
                     Tag(name: widget.genre.toLowerCase(), stationCount: 1),
@@ -67,7 +63,7 @@ class _GenrePageState extends State<GenrePage> {
                   ..setAudioType(AudioType.radio)
                   ..setSearchType(SearchType.radioTag)
                   ..search();
-              }),
+              },
               icon: Icon(Iconz.radio),
             ),
             const SizedBox(
@@ -82,7 +78,10 @@ class _GenrePageState extends State<GenrePage> {
           return CustomScrollView(
             slivers: [
               SliverPadding(
-                padding: getAdaptiveHorizontalPadding(constraints: constraints),
+                padding: getAdaptiveHorizontalPadding(constraints: constraints)
+                    .copyWith(
+                  bottom: bottomPlayerPageGap,
+                ),
                 sliver: ArtistsView(
                   artists: artistAudiosWithGenre,
                 ),

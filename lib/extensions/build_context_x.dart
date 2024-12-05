@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants.dart';
+import '../common/view/ui_constants.dart';
 
 extension BuildContextX on BuildContext {
   ThemeData get theme => Theme.of(this);
@@ -8,6 +8,7 @@ extension BuildContextX on BuildContext {
   TextTheme get textTheme => theme.textTheme;
 
   Size get mediaQuerySize => MediaQuery.sizeOf(this);
+  bool get isPortrait => MediaQuery.orientationOf(this) == Orientation.portrait;
 
   bool get smallWindow => mediaQuerySize.width < kMasterDetailBreakPoint;
   bool get wideWindow => mediaQuerySize.width < kAdaptivContainerBreakPoint;

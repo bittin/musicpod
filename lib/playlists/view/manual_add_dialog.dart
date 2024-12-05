@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 import 'package:yaru/yaru.dart';
 
+import '../../app_config.dart';
 import '../../common/data/audio.dart';
 import '../../common/view/common_widgets.dart';
 import '../../common/view/global_keys.dart';
 import '../../common/view/icons.dart';
-import '../../common/view/theme.dart';
+import '../../common/view/ui_constants.dart';
 import '../../constants.dart';
 import '../../external_path/external_path_service.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
 import '../../local_audio/local_audio_model.dart';
-import '../../local_audio/view/local_audio_view.dart';
+import '../../local_audio/local_audio_view.dart';
 import '../../podcasts/podcast_model.dart';
 
 class ManualAddDialog extends StatelessWidget {
@@ -34,16 +35,19 @@ class ManualAddDialog extends StatelessWidget {
             )
           : null,
       titlePadding: yaruStyled ? EdgeInsets.zero : null,
-      contentPadding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      contentPadding: const EdgeInsets.only(
+        left: kLargestSpace,
+        right: kLargestSpace,
+        bottom: kLargestSpace,
+      ),
       content: SizedBox(
         height: 200,
         width: 400,
         child: onlyPlaylists
             ? Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: PlaylistContent(
+                padding: const EdgeInsets.only(top: kLargestSpace),
+                child: PlaylistEditDialogContent(
                   playlistName: context.l10n.createNewPlaylist,
-                  libraryModel: di<LibraryModel>(),
                   allowCreate: true,
                 ),
               )
@@ -54,9 +58,8 @@ class ManualAddDialog extends StatelessWidget {
                 initialRoute: '/chose',
                 onGenerateRoute: (settings) {
                   Widget page = switch (settings.name) {
-                    '/addPlaylist' => PlaylistContent(
+                    '/addPlaylist' => PlaylistEditDialogContent(
                         playlistName: context.l10n.createNewPlaylist,
-                        libraryModel: di<LibraryModel>(),
                         allowCreate: true,
                       ),
                     '/addPodcast' => const AddPodcastContent(),
@@ -121,8 +124,8 @@ class SelectAddContent extends StatelessWidget {
   }
 }
 
-class PlaylistContent extends StatefulWidget {
-  const PlaylistContent({
+class PlaylistEditDialogContent extends StatefulWidget {
+  const PlaylistEditDialogContent({
     super.key,
     this.playlistName,
     this.initialValue,
@@ -130,20 +133,19 @@ class PlaylistContent extends StatefulWidget {
     this.allowDelete = false,
     this.allowRename = false,
     this.allowCreate = false,
-    required this.libraryModel,
   });
 
-  final LibraryModel libraryModel;
   final List<Audio>? audios;
   final String? playlistName;
   final String? initialValue;
   final bool allowRename, allowDelete, allowCreate;
 
   @override
-  State<PlaylistContent> createState() => _PlaylistContentState();
+  State<PlaylistEditDialogContent> createState() =>
+      _PlaylistEditDialogContentState();
 }
 
-class _PlaylistContentState extends State<PlaylistContent> {
+class _PlaylistEditDialogContentState extends State<PlaylistEditDialogContent> {
   late TextEditingController _controller;
   late TextEditingController _fileController;
 
@@ -166,6 +168,7 @@ class _PlaylistContentState extends State<PlaylistContent> {
 
   @override
   Widget build(BuildContext context) {
+    final libraryModel = di<LibraryModel>();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -210,9 +213,15 @@ class _PlaylistContentState extends State<PlaylistContent> {
               ),
               if (widget.allowDelete && widget.playlistName != null)
                 OutlinedButton(
-                  onPressed: () {
-                    widget.libraryModel.removePlaylist(widget.playlistName!);
+                  onPressed: () async {
                     Navigator.of(context).pop();
+                    libraryModel.removePlaylist(widget.playlistName!);
+                    di<LocalAudioModel>().localAudioindex =
+                        LocalAudioView.playlists.index;
+                    await libraryModel.push(
+                      pageId: kLocalAudioPageId,
+                      replace: true,
+                    );
                   },
                   child: Text(
                     context.l10n.deletePlaylist,
@@ -223,8 +232,8 @@ class _PlaylistContentState extends State<PlaylistContent> {
                   onPressed: () {
                     di<LocalAudioModel>().localAudioindex =
                         LocalAudioView.playlists.index;
-                    widget.libraryModel
-                      ..pushNamed(pageId: kLocalAudioPageId)
+                    libraryModel
+                      ..push(pageId: kLocalAudioPageId)
                       ..updatePlaylistName(
                         widget.playlistName!,
                         _controller.text,
@@ -240,7 +249,7 @@ class _PlaylistContentState extends State<PlaylistContent> {
                   onPressed: _controller.text.isEmpty
                       ? null
                       : () async {
-                          await widget.libraryModel
+                          await libraryModel
                               .addPlaylist(
                             _controller.text,
                             _audios ?? widget.audios ?? [],
@@ -252,8 +261,7 @@ class _PlaylistContentState extends State<PlaylistContent> {
                             await Future.delayed(
                               const Duration(milliseconds: 300),
                             );
-                            await widget.libraryModel
-                                .pushNamed(pageId: _controller.text);
+                            await libraryModel.push(pageId: _controller.text);
                           });
                         },
                   child: Text(
@@ -309,7 +317,7 @@ class _AddStationDialogState extends State<AddStationContent> {
           onChanged: (v) => setState(() => _urlController.text = v),
         ),
         const SizedBox(
-          height: kYaruPagePadding,
+          height: kLargestSpace,
         ),
         TextField(
           controller: _nameController,
@@ -317,7 +325,7 @@ class _AddStationDialogState extends State<AddStationContent> {
           onChanged: (v) => setState(() => _nameController.text = v),
         ),
         const SizedBox(
-          height: kYaruPagePadding,
+          height: kLargestSpace,
         ),
         Align(
           alignment: Alignment.bottomRight,
@@ -395,7 +403,7 @@ class _AddPodcastContentState extends State<AddPodcastContent> {
           onChanged: (v) => setState(() => _urlController.text = v),
         ),
         const SizedBox(
-          height: kYaruPagePadding,
+          height: kLargestSpace,
         ),
         Align(
           alignment: Alignment.bottomRight,

@@ -6,24 +6,26 @@ import 'package:yaru/yaru.dart';
 import '../../app_config.dart';
 import '../../common/view/snackbars.dart';
 import '../../common/view/theme.dart';
-import '../../constants.dart';
+import '../../common/view/ui_constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
 import '../../patch_notes/patch_notes_dialog.dart';
+import '../../player/player_model.dart';
 import '../../player/view/player_view.dart';
+import '../../podcasts/download_model.dart';
 import '../../settings/settings_model.dart';
 import '../app_model.dart';
 import '../connectivity_model.dart';
 import 'master_detail_page.dart';
 
-class MusicPodScaffold extends StatefulWidget with WatchItStatefulWidgetMixin {
-  const MusicPodScaffold({super.key});
+class DesktopHomePage extends StatefulWidget with WatchItStatefulWidgetMixin {
+  const DesktopHomePage({super.key});
 
   @override
-  State<MusicPodScaffold> createState() => _MusicPodScaffoldState();
+  State<DesktopHomePage> createState() => _DesktopHomePageState();
 }
 
-class _MusicPodScaffoldState extends State<MusicPodScaffold> {
+class _DesktopHomePageState extends State<DesktopHomePage> {
   @override
   void initState() {
     super.initState();
@@ -46,6 +48,7 @@ class _MusicPodScaffoldState extends State<MusicPodScaffold> {
   Widget build(BuildContext context) {
     final playerToTheRight = context.mediaQuerySize.width > kSideBarThreshHold;
     final isFullScreen = watchPropertyValue((AppModel m) => m.fullWindowMode);
+    final isVideo = watchPropertyValue((PlayerModel m) => m.isVideo == true);
     final enableDiscordRPC =
         watchPropertyValue((SettingsModel m) => m.enableDiscordRPC);
 
@@ -64,6 +67,16 @@ class _MusicPodScaffoldState extends State<MusicPodScaffold> {
       );
     }
 
+    registerStreamHandler(
+      select: (DownloadModel m) => m.messageStream,
+      initialValue: null,
+      handler: (context, snapshot, cancel) {
+        if (snapshot.hasData) {
+          showSnackBar(context: context, content: Text(snapshot.data ?? ''));
+        }
+      },
+    );
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -73,7 +86,7 @@ class _MusicPodScaffoldState extends State<MusicPodScaffold> {
               child: Column(
                 children: [
                   const Expanded(child: MasterDetailPage()),
-                  if (!playerToTheRight || isMobile)
+                  if (!playerToTheRight || isMobilePlatform)
                     const PlayerView(position: PlayerPosition.bottom),
                 ],
               ),
@@ -86,8 +99,9 @@ class _MusicPodScaffoldState extends State<MusicPodScaffold> {
           ],
         ),
         if (isFullScreen == true)
-          const Scaffold(
-            body: PlayerView(position: PlayerPosition.fullWindow),
+          Scaffold(
+            backgroundColor: isVideo ? Colors.black : null,
+            body: const PlayerView(position: PlayerPosition.fullWindow),
           ),
       ],
     );

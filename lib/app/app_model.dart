@@ -1,14 +1,17 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:github/github.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:safe_change_notifier/safe_change_notifier.dart';
 
+import '../app_config.dart';
 import '../constants.dart';
 import '../expose/expose_service.dart';
 import '../settings/settings_service.dart';
 
 class AppModel extends SafeChangeNotifier {
   AppModel({
-    required String appVersion,
+    required PackageInfo packageInfo,
     required SettingsService settingsService,
     required GitHub gitHub,
     required bool allowManualUpdates,
@@ -19,17 +22,29 @@ class AppModel extends SafeChangeNotifier {
         _gitHub = gitHub,
         _allowManualUpdates = allowManualUpdates,
         _settingsService = settingsService,
-        _version = appVersion,
+        _packageInfo = packageInfo,
         _exposeService = exposeService;
 
   final ExposeService _exposeService;
   Stream<String?> get errorStream => _exposeService.discordErrorStream;
   Stream<bool> get isDiscordConnectedStream =>
       _exposeService.isDiscordConnectedStream;
-
   Future<void> connectToDiscord() async => _exposeService.connectToDiscord();
   Future<void> disconnectFromDiscord() async =>
       _exposeService.disconnectFromDiscord();
+
+  ValueNotifier<bool> get isLastFmAuthorized =>
+      _exposeService.isLastFmAuthorized;
+  Future<void> authorizeLastFm({
+    required String apiKey,
+    required String apiSecret,
+  }) async =>
+      _exposeService.authorizeLastFm(
+        apiKey: apiKey,
+        apiSecret: apiSecret,
+      );
+
+  void initListenBrains() => _exposeService.initListenBrains();
 
   final GitHub _gitHub;
   final SettingsService _settingsService;
@@ -46,22 +61,44 @@ class AppModel extends SafeChangeNotifier {
     notifyListeners();
   }
 
-  bool? _fullWindowMode;
-  bool? get fullWindowMode => _fullWindowMode;
-  void setFullWindowMode(bool? value) {
-    if (value == null || value == _fullWindowMode) return;
-    _fullWindowMode = value;
+  bool _showQueueOverlay = false;
+  bool get showQueueOverlay => _showQueueOverlay;
+  void setOrToggleQueueOverlay({bool? value}) {
+    _showQueueOverlay = value ?? !_showQueueOverlay;
     notifyListeners();
   }
 
-  final String _version;
-  String? get version => _version;
+  bool? _fullWindowMode;
+  bool? get fullWindowMode => _fullWindowMode;
+  Future<void> setFullWindowMode(bool? value) async {
+    if (value == null || value == _fullWindowMode) return;
+    _fullWindowMode = value;
+
+    if (isMobilePlatform) {
+      if (_fullWindowMode == true) {
+        await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      } else {
+        await SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: SystemUiOverlay.values,
+        );
+        await SystemChrome.setPreferredOrientations(
+          [],
+        );
+      }
+    }
+
+    notifyListeners();
+  }
+
+  final PackageInfo _packageInfo;
+  String get version => _packageInfo.version;
 
   Future<void> disposePatchNotes() async =>
-      _settingsService.disposePatchNotes(_version);
+      _settingsService.disposePatchNotes(version);
 
   bool recentPatchNotesDisposed() =>
-      _settingsService.recentPatchNotesDisposed(_version);
+      _settingsService.recentPatchNotesDisposed(version);
   bool? _updateAvailable;
   bool? get updateAvailable => _updateAvailable;
   String? _onlineVersion;

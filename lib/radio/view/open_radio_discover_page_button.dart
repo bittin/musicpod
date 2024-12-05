@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
-import '../../common/data/audio.dart';
+import '../../common/data/audio_type.dart';
 import '../../common/view/common_widgets.dart';
 import '../../constants.dart';
 import '../../l10n/l10n.dart';
@@ -15,7 +15,7 @@ class OpenRadioSearchButton extends StatelessWidget with WatchItMixin {
   Widget build(BuildContext context) {
     return ImportantButton(
       onPressed: () {
-        di<LibraryModel>().pushNamed(pageId: kSearchPageId);
+        di<LibraryModel>().push(pageId: kSearchPageId);
         di<SearchModel>()
           ..setAudioType(AudioType.radio)
           ..search();

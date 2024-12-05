@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:yaru/yaru.dart';
 
-import '../../constants.dart';
-import '../../extensions/theme_data_x.dart';
+import '../../app_config.dart';
+import 'ui_constants.dart';
 import 'icons.dart';
 
 ThemeData? yaruDarkWithTweaks(YaruThemeData yaru) {
@@ -71,10 +72,6 @@ Color getPlayerBg(Color? surfaceTintColor, Color fallbackColor) {
   }
 }
 
-bool get yaruStyled => Platform.isLinux;
-
-bool get appleStyled => Platform.isMacOS || Platform.isIOS;
-
 const alphabetColors = {
   'A': Colors.red,
   'B': Colors.orange,
@@ -109,6 +106,9 @@ Color getAlphabetColor(String text, [Color fallBackColor = Colors.black]) {
   return alphabetColors[letter?.toUpperCase()] ?? fallBackColor;
 }
 
+double get searchBarWidth =>
+    isMobilePlatform ? kMobileSearchBarWidth : kDesktopSearchBarWidth;
+
 InputDecoration createMaterialDecoration({
   required ColorScheme colorScheme,
   TextStyle? style,
@@ -119,38 +119,44 @@ InputDecoration createMaterialDecoration({
   EdgeInsets? contentPadding,
   String? hintText,
   Widget? suffixIcon,
+  Widget? prefixIcon,
 }) {
   final outlineInputBorder = border ??
       OutlineInputBorder(
         borderRadius: BorderRadius.circular(100),
-        borderSide: BorderSide(width: 1, color: colorScheme.outline),
+        borderSide: BorderSide(
+          width: isMobilePlatform ? 2 : 1,
+          color: colorScheme.outline,
+        ),
       );
   return InputDecoration(
+    prefixIcon: prefixIcon,
     suffixIcon: suffixIcon,
-    suffixIconConstraints: const BoxConstraints(
-      maxWidth: 200,
-      maxHeight: kYaruTitleBarItemHeight,
+    suffixIconConstraints: BoxConstraints(
+      maxHeight: isMobilePlatform ? kToolbarHeight : kYaruTitleBarItemHeight,
     ),
     hintText: hintText,
     fillColor: fillColor,
     filled: filled,
-    contentPadding: contentPadding ??
-        const EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
+    contentPadding: isMobilePlatform
+        ? const EdgeInsets.only(top: 16, bottom: 0, left: 15, right: 15)
+        : contentPadding ??
+            const EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
     border: outlineInputBorder,
     errorBorder: outlineInputBorder,
     enabledBorder: outlineInputBorder,
     focusedBorder: outlineInputBorder.copyWith(
       borderSide: BorderSide(
-        width: 1,
         color: colorScheme.primary,
+        width: isMobilePlatform ? 2 : 1,
       ),
     ),
     disabledBorder: outlineInputBorder,
     focusedErrorBorder: outlineInputBorder,
-    helperStyle: style,
-    hintStyle: style,
-    labelStyle: style,
-    isDense: isDense,
+    helperStyle: isMobilePlatform ? null : style,
+    hintStyle: isMobilePlatform ? null : style,
+    labelStyle: isMobilePlatform ? null : style,
+    isDense: isMobilePlatform ? false : isDense,
   );
 }
 
@@ -162,6 +168,7 @@ InputDecoration createYaruDecoration({
   String? hintText,
   OutlineInputBorder? border,
   Widget? suffixIcon,
+  Widget? prefixIcon,
 }) {
   final fill = theme.inputDecorationTheme.fillColor;
 
@@ -172,6 +179,7 @@ InputDecoration createYaruDecoration({
       );
 
   return InputDecoration(
+    prefixIcon: prefixIcon,
     suffixIcon: Center(
       widthFactor: 1,
       child: suffixIcon,
@@ -198,28 +206,11 @@ InputDecoration createYaruDecoration({
   );
 }
 
-Color? chipColor(ThemeData theme) {
-  return yaruStyled
-      ? theme.colorScheme.outline.withOpacity(theme.isLight ? 1 : 0.4)
-      : null;
-}
-
-Color? chipBorder(ThemeData theme, bool loading) {
-  return yaruStyled ? (loading ? null : Colors.transparent) : null;
-}
-
-TextStyle chipTextStyle(ThemeData theme) =>
-    TextStyle(color: theme.colorScheme.onSurface);
-
-Color? chipSelectionColor(ThemeData theme, bool loading) {
-  return yaruStyled ? (loading ? theme.colorScheme.outline : null) : null;
-}
-
 double get iconSize => yaruStyled
     ? kYaruIconSize
-    : isMobile
+    : isMobilePlatform
         ? 24.0
-        : 20.0;
+        : kLargestSpace;
 
 double get sideBarImageSize => 38;
 
@@ -227,18 +218,22 @@ double get likeButtonWidth => yaruStyled ? 62 : 70;
 
 double get progressStrokeWidth => 3.0;
 
-double get avatarIconRadius =>
+double get smallAvatarButtonRadius =>
     (yaruStyled
         ? kYaruTitleBarItemHeight
-        : isMobile
+        : isMobilePlatform
             ? 42
             : 38) /
     2;
 
-double get bigPlayButtonRadius => yaruStyled ? 22 : 23;
+double get bigAvatarButtonRadius => yaruStyled
+    ? 22
+    : isMobilePlatform
+        ? 26
+        : 23;
 
 EdgeInsets get filterPanelPadding =>
-    EdgeInsets.only(top: isMobile ? 10 : 0, bottom: 10);
+    EdgeInsets.only(top: isMobilePlatform ? 10 : 0, bottom: 10);
 
 EdgeInsets get bigPlayButtonPadding =>
     EdgeInsets.symmetric(horizontal: yaruStyled ? 2.5 : 5);
@@ -252,20 +247,22 @@ FontWeight get mediumTextWeight =>
 FontWeight get largeTextWeight =>
     yaruStyled ? FontWeight.w200 : FontWeight.w300;
 
-double get chipHeight => isMobile ? 40 : 36.0;
+double get chipHeight => isMobilePlatform ? 40 : 34.0;
 
-EdgeInsets get audioTilePadding =>
-    isMobile ? kMobileAudioTilePadding : kDesktopAudioTilePadding;
+EdgeInsets get audioTilePadding => kAudioTilePadding;
 
 SliverGridDelegate get audioCardGridDelegate =>
-    isMobile ? kMobileAudioCardGridDelegate : kAudioCardGridDelegate;
+    isMobilePlatform ? kMobileAudioCardGridDelegate : kAudioCardGridDelegate;
 
-EdgeInsetsGeometry get appBarSingleActionSpacing => Platform.isMacOS
+EdgeInsets get appBarSingleActionSpacing => Platform.isMacOS
     ? const EdgeInsets.only(right: 5, left: 5)
-    : const EdgeInsets.only(right: 10, left: 20);
+    : EdgeInsets.only(right: 10, left: isMobilePlatform ? 0 : kLargestSpace);
 
 EdgeInsetsGeometry get radioHistoryListPadding =>
     EdgeInsets.only(left: yaruStyled ? 0 : 5);
+
+EdgeInsets get mainPageIconPadding =>
+    yaruStyled || appleStyled ? kMainPageIconPadding : EdgeInsets.zero;
 
 EdgeInsets get countryPillPadding => yaruStyled
     ? const EdgeInsets.only(
@@ -276,26 +273,83 @@ EdgeInsets get countryPillPadding => yaruStyled
       )
     : const EdgeInsets.only(top: 11, bottom: 11, left: 15, right: 15);
 
-double get inputHeight => isMobile
+double get inputHeight => isMobilePlatform
     ? 40
     : yaruStyled
         ? kYaruTitleBarItemHeight
         : 36;
 
-double get audioCardDimension => kAudioCardDimension - (isMobile ? 15 : 0);
+double get audioCardDimension =>
+    kAudioCardDimension - (isMobilePlatform ? 15 : 0);
 
-double get bottomPlayerHeight => isMobile ? 80.0 : 90.0;
+double get bottomPlayerDefaultHeight => isMobilePlatform ? 76.0 : 90.0;
+
+double get navigationBarHeight => bottomPlayerDefaultHeight - 25;
+
+double? get bottomPlayerPageGap => isMobilePlatform
+    ? bottomPlayerDefaultHeight + navigationBarHeight + kLargestSpace
+    : null;
+
+EdgeInsets get playerTopControlsPadding => EdgeInsets.only(
+      right: kLargestSpace,
+      top: Platform.isMacOS
+          ? 0
+          : isMobilePlatform
+              ? 2 * kLargestSpace
+              : kLargestSpace,
+    );
+
+NavigationBarThemeData navigationBarTheme({required ThemeData theme}) =>
+    theme.navigationBarTheme.copyWith(
+      iconTheme: WidgetStatePropertyAll(
+        theme.iconTheme.copyWith(
+          size: 18,
+          applyTextScaling: true,
+        ),
+      ),
+    );
+
+SystemUiOverlayStyle systemOverlayStyle({
+  required ThemeData theme,
+  required bool fullWindowMode,
+}) {
+  return theme.colorScheme.isLight
+      ? SystemUiOverlayStyle.dark.copyWith(
+          systemNavigationBarColor:
+              (fullWindowMode ? Colors.transparent : theme.cardColor),
+          statusBarColor: (fullWindowMode
+              ? Colors.transparent
+              : theme.scaffoldBackgroundColor),
+          statusBarBrightness: theme.brightness,
+        )
+      : SystemUiOverlayStyle.light.copyWith(
+          systemNavigationBarColor:
+              (fullWindowMode ? Colors.transparent : theme.cardColor),
+          statusBarColor: (fullWindowMode
+              ? Colors.transparent
+              : theme.scaffoldBackgroundColor),
+          statusBarBrightness: theme.brightness,
+        );
+}
 
 List<Widget> space({
-  double widthGap = 5,
-  double heightGap = 5,
+  double widthGap = kSmallestSpace,
+  double heightGap = kSmallestSpace,
   required Iterable<Widget> children,
+  bool expandAll = false,
 }) =>
     children
         .expand(
           (item) sync* {
-            yield SizedBox(width: widthGap);
-            yield item;
+            yield SizedBox(
+              width: widthGap,
+              height: heightGap,
+            );
+            if (expandAll) {
+              yield Expanded(child: item);
+            } else {
+              yield item;
+            }
           },
         )
         .skip(1)
