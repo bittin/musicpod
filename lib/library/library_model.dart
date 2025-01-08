@@ -201,15 +201,18 @@ class LibraryModel extends SafeChangeNotifier implements NavigatorObserver {
         await _masterNavigatorKey.currentState?.pushNamed(pageId);
       }
     } else if (builder != null) {
-      final materialPageRoute = MaterialPageRoute(
-        builder: (context) => isMobilePlatform
-            ? MobilePage(page: builder(context))
-            : BackGesture(child: builder(context)),
+      final materialPageRoute = PageRouteBuilder(
         maintainState: maintainState,
         settings: RouteSettings(
           name: pageId,
         ),
+        pageBuilder: (context, __, ___) => isMobilePlatform
+            ? MobilePage(page: builder(context))
+            : BackGesture(child: builder(context)),
+        transitionsBuilder: (_, a, __, c) =>
+            FadeTransition(opacity: a, child: c),
       );
+
       if (replace) {
         await _masterNavigatorKey.currentState?.pushReplacement(
           materialPageRoute,
@@ -262,6 +265,9 @@ class LibraryModel extends SafeChangeNotifier implements NavigatorObserver {
     printMessageInDebugMode(
       'didReplace: ${oldRoute?.settings.name}, newPageId: ${newRoute?.settings.name}',
     );
+    final pageId = newRoute?.settings.name;
+    if (pageId == null) return;
+    _setSelectedPageId(pageId);
   }
 
   @override
@@ -274,6 +280,11 @@ class LibraryModel extends SafeChangeNotifier implements NavigatorObserver {
   @override
   void didStopUserGesture() {
     printMessageInDebugMode('didStopUserGesture');
+  }
+
+  @override
+  void didChangeTop(Route topRoute, Route? previousTopRoute) {
+    printMessageInDebugMode('didChangeTop');
   }
 
   // Note: Navigator.initState ensures assert(observer.navigator == null);

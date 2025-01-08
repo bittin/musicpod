@@ -1189,5 +1189,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "home": "Hem",
+  "@home": {},
+  "showArtistPage": "Visa artist sida",
+  "@showArtistPage": {},
+  "showAlbumPage": "Visa album sida",
+  "@showAlbumPage": {}
 }

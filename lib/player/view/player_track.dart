@@ -70,9 +70,11 @@ class PlayerTrack extends StatelessWidget with WatchItMixin {
                 : const EdgeInsets.only(left: 7, right: 7, top: 3),
             child: LinearProgress(
               value: null,
-              trackHeight: yaruStyled && !bottomPlayer ? 5.0 : 4.0,
-              color: mainColor.withOpacity(0.8),
-              backgroundColor: mainColor.withOpacity(0.4),
+              trackHeight: yaruStyled && !bottomPlayer
+                  ? 5.0
+                  : (isMobilePlatform ? 2.0 : 4.0),
+              color: mainColor.withValues(alpha: 0.8),
+              backgroundColor: mainColor.withValues(alpha: 0.4),
             ),
           )
         : Padding(
@@ -88,11 +90,12 @@ class PlayerTrack extends StatelessWidget with WatchItMixin {
                   overlayShape: thumbShape,
                   minThumbSeparation: 0,
                   trackShape: trackShape as SliderTrackShape,
-                  trackHeight: bottomPlayer ? 4.0 : 4.0,
-                  inactiveTrackColor: mainColor.withOpacity(0.2),
-                  activeTrackColor: mainColor.withOpacity(0.85),
+                  trackHeight:
+                      bottomPlayer ? (isMobilePlatform ? 2.0 : 4.0) : 4.0,
+                  inactiveTrackColor: mainColor.withValues(alpha: 0.2),
+                  activeTrackColor: mainColor.withValues(alpha: 0.85),
                   overlayColor: mainColor,
-                  secondaryActiveTrackColor: mainColor.withOpacity(0.25),
+                  secondaryActiveTrackColor: mainColor.withValues(alpha: 0.25),
                 ),
                 child: RepaintBoundary(
                   child: Slider(

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:audio_service/audio_service.dart';
@@ -143,6 +142,7 @@ class PlayerService {
     await _player.dispose();
   }
 
+  List<Audio>? _oldQueue;
   Queue _queue = (name: '', audios: []);
   Queue get queue => _queue;
   void setQueue(Queue value) {
@@ -235,8 +235,13 @@ class PlayerService {
   void setShuffle(bool value) {
     if (value == _shuffle) return;
     _shuffle = value;
-    if (value && queue.audios.length > 1) {
-      _randomNext();
+    if (value) {
+      _oldQueue = _queue.audios;
+      _queue.audios.shuffle();
+    } else if (_oldQueue != null) {
+      setQueue(
+        (audios: _oldQueue!, name: _queue.name),
+      );
     }
     _propertiesChangedController.add(true);
   }
@@ -374,28 +379,12 @@ class PlayerService {
     if (queue.audios.isNotEmpty && queue.audios.contains(audio)) {
       final currentIndex = queue.audios.indexOf(audio!);
 
-      if (shuffle && queue.audios.length > 1) {
-        _randomNext();
+      if (currentIndex == queue.audios.length - 1) {
+        nextAudio = queue.audios.elementAt(0);
       } else {
-        if (currentIndex == queue.audios.length - 1) {
-          nextAudio = queue.audios.elementAt(0);
-        } else {
-          nextAudio = queue.audios.elementAt(queue.audios.indexOf(audio!) + 1);
-        }
+        nextAudio = queue.audios.elementAt(queue.audios.indexOf(audio!) + 1);
       }
     }
-  }
-
-  void _randomNext() {
-    if (audio == null) return;
-    final currentIndex = queue.audios.indexOf(audio!);
-    final max = queue.audios.length;
-    final random = Random();
-    var randomIndex = random.nextInt(max);
-    while (randomIndex == currentIndex) {
-      randomIndex = random.nextInt(max);
-    }
-    nextAudio = queue.audios.elementAt(randomIndex);
   }
 
   Future<void> playPrevious() async {
@@ -476,6 +465,10 @@ class PlayerService {
         setVolume(double.tryParse(playerState.volume!) ?? 100.0);
       }
 
+      if (playerState.rate != null) {
+        setRate(double.tryParse(playerState.rate!) ?? 1.0);
+      }
+
       _estimateNext();
 
       await _setMediaControlsMetaData(audio: playerState.audio!);
@@ -525,7 +518,9 @@ class PlayerService {
   Future<void> safeLastPosition() async {
     if (_audio?.audioType == AudioType.radio ||
         _audio?.url == null ||
-        _position == null) return;
+        _position == null) {
+      return;
+    }
     await addLastPosition(_audio!.url!, _position!);
   }
 
@@ -825,10 +820,12 @@ class PlayerService {
       audio: _audio,
       duration: _duration?.toString(),
       position: _position?.toString(),
-      queue:
-          _queue.audios.length <= 100 ? _queue.audios.take(100).toList() : null,
-      queueName: _queue.audios.length <= 100 ? _queue.name : null,
+      queue: _queue.audios.length > 100
+          ? _queue.audios.take(100).toList()
+          : _queue.audios,
+      queueName: _queue.name,
       volume: _volume.toString(),
+      rate: _rate.toString(),
     );
 
     await writeJsonToFile(playerState.toMap(), kPlayerStateFileName);

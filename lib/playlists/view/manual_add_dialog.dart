@@ -15,6 +15,7 @@ import '../../library/library_model.dart';
 import '../../local_audio/local_audio_model.dart';
 import '../../local_audio/local_audio_view.dart';
 import '../../podcasts/podcast_model.dart';
+import '../../podcasts/view/podcast_page.dart';
 
 class ManualAddDialog extends StatelessWidget {
   const ManualAddDialog({
@@ -41,7 +42,7 @@ class ManualAddDialog extends StatelessWidget {
         bottom: kLargestSpace,
       ),
       content: SizedBox(
-        height: 200,
+        height: 220,
         width: 400,
         child: onlyPlaylists
             ? Padding(
@@ -199,6 +200,9 @@ class _PlaylistEditDialogContentState extends State<PlaylistEditDialogContent> {
               ),
             ),
           ),
+        const SizedBox(
+          height: kLargestSpace,
+        ),
         Align(
           alignment: Alignment.bottomRight,
           child: Wrap(
@@ -422,9 +426,18 @@ class _AddPodcastContentState extends State<AddPodcastContent> {
                     ? null
                     : () {
                         di<PodcastModel>().loadPodcast(
-                          context: context,
                           feedUrl: _urlController.text,
-                          libraryModel: di<LibraryModel>(),
+                          onFind: (podcast) => di<LibraryModel>().push(
+                            builder: (_) => PodcastPage(
+                              imageUrl: podcast.firstOrNull?.imageUrl,
+                              preFetchedEpisodes: podcast,
+                              feedUrl: _urlController.text,
+                              title: podcast.firstOrNull?.album ??
+                                  podcast.firstOrNull?.title ??
+                                  _urlController.text,
+                            ),
+                            pageId: _urlController.text,
+                          ),
                         );
                       },
                 child: Text(

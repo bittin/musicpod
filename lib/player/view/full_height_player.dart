@@ -18,7 +18,8 @@ import 'player_main_controls.dart';
 import 'player_title_and_artist.dart';
 import 'player_track.dart';
 import 'player_view.dart';
-import 'queue_button.dart';
+import 'queue/queue_body.dart';
+import 'queue/queue_button.dart';
 
 class FullHeightPlayer extends StatelessWidget with WatchItMixin {
   const FullHeightPlayer({
@@ -99,7 +100,7 @@ class FullHeightPlayer extends StatelessWidget with WatchItMixin {
       );
 
       body = Stack(
-        alignment: Alignment.topRight,
+        alignment: Alignment.center,
         children: [
           Center(
             child: playerWithSidePanel
@@ -113,11 +114,20 @@ class FullHeightPlayer extends StatelessWidget with WatchItMixin {
                   )
                 : column,
           ),
-          FullHeightPlayerTopControls(
-            iconColor: iconColor,
-            playerPosition: playerPosition,
-            showQueueButton: !playerWithSidePanel,
+          Positioned(
+            top: 0,
+            right: 0,
+            child: FullHeightPlayerTopControls(
+              iconColor: iconColor,
+              playerPosition: playerPosition,
+              showQueueButton: !isMobilePlatform && !playerWithSidePanel,
+            ),
           ),
+          if (isMobilePlatform)
+            const Positioned(
+              bottom: 2 * kLargestSpace,
+              child: QueueButton.text(),
+            ),
         ],
       );
     }

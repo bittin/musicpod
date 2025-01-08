@@ -7,6 +7,7 @@ import '../../common/view/icons.dart';
 import '../../common/view/side_bar_fall_back_image.dart';
 import '../../common/view/theme.dart';
 import '../../constants.dart';
+import '../../home/home_page.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
 import '../../local_audio/view/album_page.dart';
@@ -82,6 +83,14 @@ List<MasterItem> createMasterItems({required LibraryModel libraryModel}) {
             Icon(selected ? Iconz.settingsFilled : Iconz.settings),
         pageBuilder: (context) => const SettingsPage(),
         pageId: kSettingsPageId,
+      ),
+    if (isMobilePlatform)
+      MasterItem(
+        titleBuilder: (context) => Text(context.l10n.home),
+        iconBuilder: (selected) =>
+            Icon(selected ? Iconz.homeFilled : Iconz.home),
+        pageBuilder: (context) => const HomePage(),
+        pageId: kHomePageId,
       ),
     MasterItem(
       iconBuilder: (selected) => Icon(Iconz.plus),

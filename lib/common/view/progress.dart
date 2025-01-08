@@ -61,7 +61,7 @@ class Progress extends StatelessWidget {
               backgroundColor: value == null
                   ? null
                   : (backgroundColor ??
-                      context.theme.colorScheme.primary.withOpacity(0.3)),
+                      context.theme.colorScheme.primary.withValues(alpha: 0.3)),
             ),
           );
   }
@@ -85,7 +85,6 @@ class LinearProgress extends StatelessWidget {
     return yaruStyled
         ? YaruLinearProgressIndicator(
             value: value,
-            minHeight: trackHeight,
             strokeWidth: trackHeight,
             color: color,
           )
