@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:path/path.dart' as p;
 import 'package:safe_change_notifier/safe_change_notifier.dart';
 
 import '../common/data/audio.dart';
+import '../common/view/snackbars.dart';
 import '../library/library_service.dart';
 import '../settings/settings_service.dart';
 
@@ -159,5 +161,15 @@ class DownloadModel extends SafeChangeNotifier {
   Future<void> dispose() async {
     await _messageStreamController.close();
     super.dispose();
+  }
+}
+
+void downloadMessageStreamHandler(
+  BuildContext context,
+  AsyncSnapshot<String?> snapshot,
+  void Function() cancel,
+) {
+  if (snapshot.hasData) {
+    showSnackBar(context: context, content: Text(snapshot.data ?? ''));
   }
 }

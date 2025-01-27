@@ -1,5 +1,38 @@
 # Changelog
 
+## [2.8.0](https://github.com/ubuntu-flutter-community/musicpod/compare/v2.7.0...v2.8.0) (2025-01-25)
+
+
+### Features
+
+* add reset app section to settings ([#1126](https://github.com/ubuntu-flutter-community/musicpod/issues/1126)) ([b4d143d](https://github.com/ubuntu-flutter-community/musicpod/commit/b4d143dfab4f95a7a1daea479748182849d7786b))
+* create data save mode for mobile connections ([#1128](https://github.com/ubuntu-flutter-community/musicpod/issues/1128)) ([c3ddadc](https://github.com/ubuntu-flutter-community/musicpod/commit/c3ddadcc1f874f2252eb09c74333dc969e1580cf)), closes [#1112](https://github.com/ubuntu-flutter-community/musicpod/issues/1112)
+* mark podcast episodes as played ([#1125](https://github.com/ubuntu-flutter-community/musicpod/issues/1125)) ([3b80a25](https://github.com/ubuntu-flutter-community/musicpod/commit/3b80a251e04461404377e3581283254fb0cd77e0)), closes [#1117](https://github.com/ubuntu-flutter-community/musicpod/issues/1117)
+* similar station button, auto data safe mode, move handlers ([#1129](https://github.com/ubuntu-flutter-community/musicpod/issues/1129)) ([1c72498](https://github.com/ubuntu-flutter-community/musicpod/commit/1c7249890e1aecb335f5430a2543c49bd688cefd))
+
+
+### Bug Fixes
+
+* make podcast subscribe icon more clear, dont allow podcasts in playlists, add onTap for radio metadata url ([#1123](https://github.com/ubuntu-flutter-community/musicpod/issues/1123)) ([ad7aa2d](https://github.com/ubuntu-flutter-community/musicpod/commit/ad7aa2dacbbbea281f5af31ed1c4d6e0671dc96b)), closes [#1122](https://github.com/ubuntu-flutter-community/musicpod/issues/1122) [#1107](https://github.com/ubuntu-flutter-community/musicpod/issues/1107)
+* range error for empty filtered podcast subs ([#1127](https://github.com/ubuntu-flutter-community/musicpod/issues/1127)) ([76df047](https://github.com/ubuntu-flutter-community/musicpod/commit/76df04735c0efa4167f6fffb96091de894d5c58c))
+
+## [2.7.0](https://github.com/ubuntu-flutter-community/musicpod/compare/v2.6.0...v2.7.0) (2025-01-19)
+
+
+### Features
+
+* Added translation using Weblate (Estonian) ([#1115](https://github.com/ubuntu-flutter-community/musicpod/issues/1115)) ([c687b07](https://github.com/ubuntu-flutter-community/musicpod/commit/c687b07b5c085de815d097f7745dabbfbd26f67f))
+* Translated using Weblate (Estonian) ([#1116](https://github.com/ubuntu-flutter-community/musicpod/issues/1116)) ([1ee795d](https://github.com/ubuntu-flutter-community/musicpod/commit/1ee795d56f1fc8186e6d24332e8dc5d0d06e0282))
+* Translated using Weblate (French) ([#1105](https://github.com/ubuntu-flutter-community/musicpod/issues/1105)) ([8a3a328](https://github.com/ubuntu-flutter-community/musicpod/commit/8a3a328959a5bd49cd2f511a69ea69656b881839))
+* Translated using Weblate (German) ([#1109](https://github.com/ubuntu-flutter-community/musicpod/issues/1109)) ([b66bdf6](https://github.com/ubuntu-flutter-community/musicpod/commit/b66bdf627b7300029a2eb127bdcf37dede16e017))
+* Translations update from Hosted Weblate ([#1118](https://github.com/ubuntu-flutter-community/musicpod/issues/1118)) ([93d3f3e](https://github.com/ubuntu-flutter-community/musicpod/commit/93d3f3e0a5d9b14d72cadae2600a0a57697d1182))
+
+
+### Bug Fixes
+
+* Album cover defaults to the back cover if there are two embedded images in a file ([#1121](https://github.com/ubuntu-flutter-community/musicpod/issues/1121)) ([23442cd](https://github.com/ubuntu-flutter-community/musicpod/commit/23442cd01989629528530eea3fcc4dac8a219341)), closes [#1111](https://github.com/ubuntu-flutter-community/musicpod/issues/1111)
+* insert gap for android 3 button navigation, dont overwrite charts peak with search, reduce desktop padding ([#1120](https://github.com/ubuntu-flutter-community/musicpod/issues/1120)) ([5d68b82](https://github.com/ubuntu-flutter-community/musicpod/commit/5d68b82718a69b48b1273b3406621443e0e87b7d))
+
 ## [2.6.0](https://github.com/ubuntu-flutter-community/musicpod/compare/v2.5.0...v2.6.0) (2024-12-19)
 
 

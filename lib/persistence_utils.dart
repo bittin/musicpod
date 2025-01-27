@@ -6,9 +6,9 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:xdg_directories/xdg_directories.dart';
 
+import 'common/data/audio.dart';
 import 'common/logging.dart';
 import 'constants.dart';
-import 'common/data/audio.dart';
 
 String? _workingDir;
 Future<String> getWorkingDir() async {
@@ -64,11 +64,11 @@ Future<String?> getDownloadsDefaultDir() async {
   return null;
 }
 
-Future<void> writeCustomSetting(
-  String? key,
-  dynamic value, [
-  String filename = kSettingsFileName,
-]) async {
+Future<void> writeCustomSetting({
+  required String? key,
+  required dynamic value,
+  required String filename,
+}) async {
   if (key == null || value == null) return;
   final oldSettings = await getCustomSettings(filename);
   if (oldSettings.containsKey(key)) {
@@ -83,16 +83,42 @@ Future<void> writeCustomSetting(
   final file = File(p.join(workingDir, filename));
 
   if (!file.existsSync()) {
-    file.create();
+    file.createSync();
   }
 
   await file.writeAsString(jsonStr);
 }
 
-Future<void> removeCustomSetting(
-  String key, [
-  String filename = kSettingsFileName,
-]) async {
+Future<void> writeCustomSettings({
+  required List<MapEntry<String, dynamic>> entries,
+  required String filename,
+}) async {
+  if (entries.isEmpty) return;
+  final oldSettings = await getCustomSettings(filename);
+
+  for (var entry in entries) {
+    if (oldSettings.containsKey(entry.key)) {
+      oldSettings.update(entry.key, (v) => entry.value);
+    } else {
+      oldSettings.putIfAbsent(entry.key, () => entry.value);
+    }
+  }
+
+  final jsonStr = jsonEncode(oldSettings);
+  final workingDir = await getWorkingDir();
+  final file = File(p.join(workingDir, filename));
+
+  if (!file.existsSync()) {
+    await file.create();
+  }
+
+  await file.writeAsString(jsonStr);
+}
+
+Future<void> removeCustomSetting({
+  required String key,
+  required String filename,
+}) async {
   final oldSettings = await getCustomSettings(filename);
   if (oldSettings.containsKey(key)) {
     oldSettings.remove(key);
@@ -103,24 +129,43 @@ Future<void> removeCustomSetting(
     final file = File(p.join(workingDir, filename));
 
     if (!file.existsSync()) {
-      file.create();
+      await file.create();
     }
     await file.writeAsString(jsonStr);
   }
 }
 
-Future<dynamic> readCustomSetting(
-  dynamic key, [
-  String filename = kSettingsFileName,
-]) async {
+Future<void> removeCustomSettings({
+  required List<String> keys,
+  required String filename,
+}) async {
+  final oldSettings = await getCustomSettings(filename);
+  for (var key in keys) {
+    if (oldSettings.containsKey(key)) {
+      oldSettings.remove(key);
+    }
+  }
+
+  final jsonStr = jsonEncode(oldSettings);
+  final workingDir = await getWorkingDir();
+  final file = File(p.join(workingDir, filename));
+
+  if (!file.existsSync()) {
+    await file.create();
+  }
+  await file.writeAsString(jsonStr);
+}
+
+Future<dynamic> readCustomSetting({
+  required dynamic key,
+  required String filename,
+}) async {
   if (key == null) return null;
   final oldSettings = await getCustomSettings(filename);
   return oldSettings[key];
 }
 
-Future<Map<String, String>> getCustomSettings([
-  String filename = kSettingsFileName,
-]) async {
+Future<Map<String, String>> getCustomSettings(String filename) async {
   final workingDir = await getWorkingDir();
 
   final file = File(p.join(workingDir, filename));
@@ -143,6 +188,16 @@ Future<Map<String, String>> getCustomSettings([
   }
 }
 
+Future<void> wipeCustomSettings({required String filename}) async {
+  final workingDir = await getWorkingDir();
+
+  final file = File(p.join(workingDir, filename));
+
+  if (!file.existsSync()) {
+    await file.delete();
+  }
+}
+
 Future<void> writeStringIterable({
   required Iterable<String> iterable,
   required String filename,
@@ -150,7 +205,7 @@ Future<void> writeStringIterable({
   final workingDir = await getWorkingDir();
   final file = File('$workingDir/$filename');
   if (!file.existsSync()) {
-    file.create();
+    await file.create();
   }
   await file.writeAsString(iterable.join('\n'));
 }
@@ -168,10 +223,10 @@ Future<Iterable<String>?> readStringIterable({
   return content;
 }
 
-Future<void> writeAudioMap(
-  Map<String, List<Audio>> map,
-  String fileName,
-) async {
+Future<void> writeAudioMap({
+  required Map<String, List<Audio>> map,
+  required String fileName,
+}) async {
   final dynamicMap = map.map(
     (key, value) => MapEntry<String, List<dynamic>>(
       key,

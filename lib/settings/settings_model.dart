@@ -86,6 +86,10 @@ class SettingsModel extends SafeChangeNotifier {
   bool get useMoreAnimations => _service.useMoreAnimations;
   void setUseMoreAnimations(bool value) => _service.setUseMoreAnimations(value);
 
+  bool get notifyDataSafeMode => _service.notifyDataSafeMode;
+  void setNotifyDataSafeMode(bool value) =>
+      _service.setNotifyDataSafeMode(value);
+
   bool get usePodcastIndex => _service.usePodcastIndex;
   Future<void> setUsePodcastIndex(bool value) async =>
       _service.setUsePodcastIndex(value);
@@ -111,6 +115,8 @@ class SettingsModel extends SafeChangeNotifier {
   bool get showPositionDuration => _service.showPositionDuration;
   Future<void> setShowPositionDuration(bool value) async =>
       _service.setShowPositionDuration(value);
+
+  Future<void> wipeAllSettings() async => _service.wipeAllSettings();
 
   void init() => _propertiesChangedSub ??=
       _service.propertiesChanged.listen((_) => notifyListeners());

@@ -6,6 +6,7 @@ import 'package:phoenix_theme/phoenix_theme.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../app_config.dart';
+import '../../common/page_ids.dart';
 import '../../common/view/theme.dart';
 import '../../constants.dart';
 import '../../external_path/external_path_service.dart';
@@ -57,7 +58,7 @@ class _MobileMusicPodAppState extends State<MobileMusicPodApp> {
       navigatorKey: libraryModel.masterNavigatorKey,
       navigatorObservers: [libraryModel],
       initialRoute: isMobilePlatform
-          ? (libraryModel.selectedPageId ?? kLocalAudioPageId)
+          ? (libraryModel.selectedPageId ?? PageIDs.homePage)
           : null,
       onGenerateRoute: (settings) {
         final page = (masterItems.firstWhereOrNull(
@@ -74,8 +75,6 @@ class _MobileMusicPodAppState extends State<MobileMusicPodApp> {
                 ? MobilePage(page: page)
                 : const SplashScreen(),
           ),
-          transitionsBuilder: (_, a, __, c) =>
-              FadeTransition(opacity: a, child: c),
         );
       },
       debugShowCheckedModeBanner: false,

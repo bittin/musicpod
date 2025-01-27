@@ -13,6 +13,7 @@ import '../common/data/audio.dart';
 import '../common/data/audio_type.dart';
 import '../common/data/mpv_meta_data.dart';
 import '../common/data/player_state.dart';
+import '../common/file_names.dart';
 import '../common/logging.dart';
 import '../constants.dart';
 import '../expose/expose_service.dart';
@@ -441,9 +442,7 @@ class PlayerService {
   Future<void> _setPlayerState() async {
     final playerState = await _readPlayerState();
 
-    _lastPositions = (await getCustomSettings(kLastPositionsFileName)).map(
-      (key, value) => MapEntry(key, value.parsedDuration ?? Duration.zero),
-    );
+    await _loadLastPositions();
 
     if (playerState?.audio != null) {
       _setAudio(playerState!.audio!);
@@ -475,6 +474,12 @@ class PlayerService {
     }
   }
 
+  Future<void> _loadLastPositions() async {
+    _lastPositions = (await getCustomSettings(FileNames.lastPositions)).map(
+      (key, value) => MapEntry(key, value.parsedDuration ?? Duration.zero),
+    );
+  }
+
   //
   // Last Positions used when the app re-opens and for podcasts
   //
@@ -485,9 +490,9 @@ class PlayerService {
   Map<String, Duration> get lastPositions => _lastPositions;
   Future<void> addLastPosition(String key, Duration lastPosition) async {
     await writeCustomSetting(
-      key,
-      lastPosition.toString(),
-      kLastPositionsFileName,
+      key: key,
+      value: lastPosition.toString(),
+      filename: FileNames.lastPositions,
     );
     if (_lastPositions.containsKey(key)) {
       _lastPositions.update(key, (value) => lastPosition);
@@ -497,20 +502,39 @@ class PlayerService {
     _propertiesChangedController.add(true);
   }
 
+  Future<void> safeAllLastPositions(List<Audio> audios) async {
+    await writeCustomSettings(
+      entries: audios
+          .where((e) => e.url != null && e.durationMs != null)
+          .map(
+            (e) => MapEntry(
+              e.url!,
+              Duration(milliseconds: e.durationMs!.toInt()).toString(),
+            ),
+          )
+          .toList(),
+      filename: FileNames.lastPositions,
+    );
+    await _loadLastPositions();
+
+    _propertiesChangedController.add(true);
+  }
+
   Future<void> removeLastPosition(String key) async {
-    await removeCustomSetting(key, kLastPositionsFileName);
+    await removeCustomSetting(key: key, filename: FileNames.lastPositions);
     _lastPositions.remove(key);
     _propertiesChangedController.add(true);
   }
 
   Future<void> removeLastPositions(List<Audio> audios) async {
-    for (var e in audios) {
-      if (e.url != null) {
-        await removeCustomSetting(e.url!, kLastPositionsFileName);
-        _lastPositions.remove(e.url!);
-        _propertiesChangedController.add(true);
-      }
-    }
+    await removeCustomSettings(
+      keys: audios.where((e) => e.url != null).map((e) => e.url!).toList(),
+      filename: FileNames.lastPositions,
+    );
+
+    await _loadLastPositions();
+
+    _propertiesChangedController.add(true);
   }
 
   Duration? getLastPosition(String? url) => _lastPositions[url];
@@ -736,6 +760,13 @@ class PlayerService {
   //
   // Everything related to radio stream icy-title information observed from MPV and digested here
   //
+  bool _dataSafeMode = false;
+  bool get dataSafeMode => _dataSafeMode;
+  void setDataSafeMode(bool value) {
+    if (value == _dataSafeMode) return;
+    _dataSafeMode = value;
+    _propertiesChangedController.add(true);
+  }
 
   MpvMetaData? _mpvMetaData;
   MpvMetaData? get mpvMetaData => _mpvMetaData;
@@ -784,7 +815,10 @@ class PlayerService {
 
   Future<void> _processParsedIcyTitle(String parsedIcyTitle) async {
     final songInfo = parsedIcyTitle.splitByDash;
-    final albumArt = await _onlineArtService.fetchAlbumArt(parsedIcyTitle);
+    String? albumArt;
+    if (!_dataSafeMode) {
+      albumArt = await _onlineArtService.fetchAlbumArt(parsedIcyTitle);
+    }
 
     final mergedAudio =
         (_audio ?? const Audio(audioType: AudioType.radio)).copyWith(
@@ -828,13 +862,13 @@ class PlayerService {
       rate: _rate.toString(),
     );
 
-    await writeJsonToFile(playerState.toMap(), kPlayerStateFileName);
+    await writeJsonToFile(playerState.toMap(), FileNames.playerState);
   }
 
   Future<PlayerState?> _readPlayerState() async {
     try {
       final workingDir = await getWorkingDir();
-      final file = File(p.join(workingDir, kPlayerStateFileName));
+      final file = File(p.join(workingDir, FileNames.playerState));
 
       if (file.existsSync()) {
         final jsonStr = await file.readAsString();

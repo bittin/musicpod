@@ -5,19 +5,20 @@ import '../../app/app_model.dart';
 import '../../app/connectivity_model.dart';
 import '../../app_config.dart';
 import '../../common/data/audio_type.dart';
+import '../../common/page_ids.dart';
 import '../../common/view/icons.dart';
 import '../../common/view/like_icon.dart';
 import '../../common/view/search_button.dart';
 import '../../common/view/share_button.dart';
 import '../../common/view/theme.dart';
 import '../../common/view/ui_constants.dart';
-import '../../constants.dart';
 import '../../extensions/build_context_x.dart';
 import '../../l10n/l10n.dart';
 import '../../library/library_model.dart';
 import '../../player/player_model.dart';
 import '../../search/search_model.dart';
 import 'playback_rate_button.dart';
+import 'player_pause_timer_button.dart';
 import 'player_view.dart';
 import 'queue/queue_button.dart';
 import 'volume_popup.dart';
@@ -66,12 +67,13 @@ class FullHeightPlayerTopControls extends StatelessWidget with WatchItMixin {
         children: [
           if (playerPosition == PlayerPosition.fullWindow)
             SearchButton(
+              iconColor: iconColor,
               onPressed: () async {
                 await onFullHeightButtonPressed();
                 di<SearchModel>()
                   ..setSearchQuery('')
                   ..setAudioType(audio?.audioType);
-                di<LibraryModel>().push(pageId: kSearchPageId);
+                di<LibraryModel>().push(pageId: PageIDs.searchPage);
               },
             ),
           if (audio?.audioType != AudioType.podcast)
@@ -86,7 +88,14 @@ class FullHeightPlayerTopControls extends StatelessWidget with WatchItMixin {
                 ),
               _ => const SizedBox.shrink(),
             },
-          if (showQueueButton) QueueButton(color: iconColor),
+          if (showQueueButton)
+            QueueButton(
+              color: iconColor,
+              onTap: () => di<AppModel>().setOrToggleQueueOverlay(),
+            ),
+          PlayerPauseTimerButton(
+            iconColor: iconColor,
+          ),
           ShareButton(
             audio: audio,
             active: active,

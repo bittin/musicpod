@@ -1,20 +1,24 @@
-import '../../common/data/audio.dart';
-import '../../common/view/icons.dart';
-import '../../l10n/l10n.dart';
-import '../../player/player_model.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
-class PodcastReplayButton extends StatelessWidget {
-  const PodcastReplayButton({super.key, required this.audios});
+import '../../common/view/icons.dart';
+import '../../l10n/l10n.dart';
+import '../../library/library_model.dart';
+import '../../player/player_model.dart';
 
-  final List<Audio> audios;
+class PodcastReplayButton extends StatelessWidget with WatchItMixin {
+  const PodcastReplayButton({super.key, required this.feedUrl});
+
+  final String feedUrl;
 
   @override
   Widget build(BuildContext context) {
+    final podcast = watchPropertyValue((LibraryModel m) => m.podcasts[feedUrl]);
     return IconButton(
       tooltip: context.l10n.replayAllEpisodes,
-      onPressed: () => di<PlayerModel>().removeLastPositions(audios),
+      onPressed: podcast == null
+          ? null
+          : () => di<PlayerModel>().removeLastPositions(podcast),
       icon: Icon(Iconz.replay),
     );
   }

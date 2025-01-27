@@ -216,25 +216,25 @@ class Iconz {
           : Icons.settings;
 
   static IconData get addToLibrary => yaruStyled
-      ? YaruIcons.bell
+      ? YaruIcons.plus
       : appleStyled
-          ? CupertinoIcons.bell
-          : Icons.notifications_outlined;
+          ? CupertinoIcons.plus
+          : Icons.add;
   static IconData get removeFromLibrary => yaruStyled
-      ? YaruIcons.bell_filled
+      ? YaruIcons.checkmark
       : appleStyled
-          ? CupertinoIcons.bell_fill
-          : Icons.notifications_rounded;
+          ? CupertinoIcons.check_mark
+          : Icons.check;
   static IconData get refresh => yaruStyled
       ? YaruIcons.refresh
       : appleStyled
           ? CupertinoIcons.refresh
           : Icons.refresh_rounded;
   static IconData get replay => yaruStyled
-      ? YaruIcons.history
+      ? YaruIcons.revert
       : appleStyled
-          ? CupertinoIcons.clock
-          : Icons.history_rounded;
+          ? CupertinoIcons.arrow_counterclockwise_circle
+          : Icons.undo;
   static IconData get speakerLowFilled => yaruStyled
       ? YaruIcons.speaker_low_filled
       : appleStyled
@@ -462,4 +462,14 @@ class Iconz {
       : appleStyled
           ? CupertinoIcons.moon
           : Icons.mode_night_rounded;
+  static IconData get markAllRead => yaruStyled
+      ? YaruIcons.ok_filled
+      : appleStyled
+          ? CupertinoIcons.check_mark_circled_solid
+          : Icons.check_circle;
+  static IconData get radioHistory => yaruStyled
+      ? YaruIcons.music_history
+      : appleStyled
+          ? CupertinoIcons.clock
+          : Icons.history_rounded;
 }

@@ -117,6 +117,10 @@ class PlayerModel extends SafeChangeNotifier {
   Map<String, Duration>? get lastPositions => _playerService.lastPositions;
   Duration? getLastPosition(String? url) => _playerService.getLastPosition(url);
   Future<void> safeLastPosition() => _playerService.safeLastPosition();
+
+  Future<void> safeAllLastPositions(List<Audio> audios) =>
+      _playerService.safeAllLastPositions(audios);
+
   Future<void> removeLastPosition(String key) =>
       _playerService.removeLastPosition(key);
   Future<void> removeLastPositions(List<Audio> audios) =>
@@ -162,6 +166,9 @@ class PlayerModel extends SafeChangeNotifier {
     _bottomPlayerHeight = value;
     notifyListeners();
   }
+
+  void setDataSafeMode(bool value) => _playerService.setDataSafeMode(value);
+  bool get dataSafeMode => _playerService.dataSafeMode;
 
   @override
   Future<void> dispose() async {
